@@ -1,0 +1,7 @@
+{
+  "name": "kulturdaten",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
