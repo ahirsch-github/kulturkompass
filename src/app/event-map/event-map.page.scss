@@ -1,10 +1,9 @@
 ion-content {
-    --background: none transparent;
-    --overflow: hidden; /* Verhindert Scrollen außerhalb der Karte */
-    height: 100%; /* Setzt die Höhe des Inhalts auf 100% des Bildschirms */
-  }
-  
-  #map {
-    height: 100%; /* Setzt die Höhe der Karte auf 100% des ion-content */
-  }
-  
+  --background: none transparent;
+  --overflow: hidden; /* Verhindert Scrollen außerhalb der Karte */
+  height: 100%;
+}
+
+#map {
+  height: 100%; /* Setzt die Höhe der Karte auf 100% des ion-content */
+}
