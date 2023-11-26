@@ -16,13 +16,16 @@ export class EventListPage implements OnInit {
   private loadEvents(): void {
     const page = this.eventPage + 1;
     this.kulturdatenService.getEvents(page).subscribe(response => {
-      this.events = response.data;
+      if (this.events && this.events.events) {
+        this.events.events = [...this.events.events, ...response.data.events];
+      } else {
+        this.events = response.data;
+      }
       this.eventPage = page;
-      console.log(this.events)
+      console.log(this.events);
     }, error => {
       console.error('Ein Fehler ist aufgetreten:', error);
-    }
-    );
+    });
   }
 
   ngOnInit() {
