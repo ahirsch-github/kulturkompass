@@ -7,7 +7,6 @@ import { IonicModule } from '@ionic/angular';
 import { TabsPageRoutingModule } from './tabs-routing.module';
 
 import { TabsPage } from './tabs.page';
-import { SearchBarComponent } from '../components/search-bar/search-bar.component';
 
 @NgModule({
   imports: [
@@ -16,7 +15,7 @@ import { SearchBarComponent } from '../components/search-bar/search-bar.componen
     IonicModule,
     TabsPageRoutingModule
   ],
-  declarations: [TabsPage, SearchBarComponent],
-  exports: [SearchBarComponent]
+  declarations: [TabsPage],
+  exports: []
 })
 export class TabsPageModule {}

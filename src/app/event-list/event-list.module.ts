@@ -1,24 +1,18 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
+import { DatePipe } from '@angular/common';
 
 import { EventListPageRoutingModule } from './event-list-routing.module';
 
 import { EventListPage } from './event-list.page';
-import { KulturdatenService } from '../services/kulturdaten.service';
-import { HttpClientModule } from '@angular/common/http';
+import { SharedModuleModule } from '../shared-module/shared-module.module';
+import { IonicModule } from '@ionic/angular';
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
     EventListPageRoutingModule,
-    HttpClientModule,
+    SharedModuleModule,
   ],
   declarations: [EventListPage],
-  providers: [KulturdatenService, DatePipe]
+  providers: [DatePipe]
 })
 export class EventListPageModule {}

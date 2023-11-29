@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -11,6 +11,10 @@ import { throwError } from 'rxjs';
 export class KulturdatenService {
 
   private readonly baseUrl: string = 'https://kulturdaten-api-staging.onrender.com/api';
+  private readonly headers: HttpHeaders = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  });
 
   constructor(private http: HttpClient) { }
 
@@ -18,6 +22,48 @@ export class KulturdatenService {
     return this.http.get(`${this.baseUrl}/events?page=${page}`)
       .pipe(
         catchError(this.handleError)
+      );
+  }
+
+  searchAttractionsbyTag(tag: string[]): Observable<any> {
+    const body = {
+      searchFilter: {
+        tags: {
+          "$in": tag
+        }
+      }
+    };
+    return this.http.post(`${this.baseUrl}/attractions/search`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError) // Stelle sicher, dass du eine handleError-Methode hast
+      );
+  }
+
+  searchAttractions(searchTerm: string): Observable<any> {
+    // Erstelle den Anfragekörper mit dem Suchbegriff
+    const body = {
+      searchFilter: {
+        $or: [
+          {
+            "title.de": {
+              $regex: searchTerm,
+              $options: 'i' // 'i' für case-insensitive
+            }
+          },
+          {
+            "description.de": {
+              $regex: searchTerm,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    };
+
+    // Führe die POST-Anfrage mit dem HttpClient aus
+    return this.http.post(`${this.baseUrl}/attractions/search`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError) // Stelle sicher, dass du eine handleError-Methode hast
       );
   }
 
