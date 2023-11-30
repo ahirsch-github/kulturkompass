@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { HttpClientModule } from '@angular/common/http';
 import { KulturdatenService } from '../services/kulturdaten.service';
+import { TabsPageModule } from '../tabs/tabs.module';
 
 
 
@@ -14,9 +15,9 @@ import { KulturdatenService } from '../services/kulturdaten.service';
     CommonModule,
     FormsModule,
     IonicModule,
-    HttpClientModule,
+    HttpClientModule
   ],
-  exports: [SearchBarComponent],
+  exports: [SearchBarComponent, IonicModule],
   providers: [KulturdatenService]
 })
 export class SharedModuleModule { }

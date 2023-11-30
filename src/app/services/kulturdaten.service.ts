@@ -25,6 +25,20 @@ export class KulturdatenService {
       );
   }
 
+  getEventsByAttractionIds(attractionIds: string[], page: number): Observable<any> {
+    const body = {
+      searchFilter: {
+        "attractions.referenceId": {
+            "$in": attractionIds
+        }
+      }
+    };
+    return this.http.post(`${this.baseUrl}/events/search?page=${page}`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   searchAttractionsbyTag(tag: string[]): Observable<any> {
     const body = {
       searchFilter: {
@@ -40,14 +54,13 @@ export class KulturdatenService {
   }
 
   searchAttractions(searchTerm: string): Observable<any> {
-    // Erstelle den Anfragekörper mit dem Suchbegriff
     const body = {
       searchFilter: {
         $or: [
           {
             "title.de": {
               $regex: searchTerm,
-              $options: 'i' // 'i' für case-insensitive
+              $options: 'i'
             }
           },
           {
@@ -59,11 +72,9 @@ export class KulturdatenService {
         ]
       }
     };
-
-    // Führe die POST-Anfrage mit dem HttpClient aus
-    return this.http.post(`${this.baseUrl}/attractions/search`, body, { headers: this.headers })
+    return this.http.post(`${this.baseUrl}/attractions/search?pageSize=5000`, body, { headers: this.headers })
       .pipe(
-        catchError(this.handleError) // Stelle sicher, dass du eine handleError-Methode hast
+        catchError(this.handleError)
       );
   }
 
