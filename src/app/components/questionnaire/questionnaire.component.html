@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Willkommen</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="true">
+  <form (ngSubmit)="submitAnswers()" [formGroup]="questionForm">
+    <ion-list lines="none" class="questionnaire-content">
+      <ion-label class="intro-text">
+        <p>Um die Benutzererfahrung zu verbessern, bitten wir Sie, einige Fragen zu beantworten.</p>
+      </ion-label>
+        <ion-label class="question-text">Welcher Veranstaltungen interessieren Sie?</ion-label>
+        <ion-segment formControlName="eventType">
+          <ion-segment-button value="music">
+            <ion-label>Musik</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="theater">
+            <ion-label>Theater</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="sports">
+            <ion-label>Sport</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="workshops">
+            <ion-label>Workshops</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="exhibitions">
+            <ion-label>Kunst</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+        <ion-label class="question-text">Wie oft besuchen Sie Events?</ion-label>
+        <ion-segment formControlName="frequency">
+          <ion-segment-button value="weekly">
+            <ion-label>Wöchentlich</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="monthly">
+            <ion-label>Monatlich</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="rarely">
+            <ion-label>Selten</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+        <ion-label class="question-text">Was ist Ihnen bei einem Event wichtig?</ion-label>
+        <ion-segment formControlName="priority">
+          <ion-segment-button value="free">
+            <ion-label>Kosten</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="exclusive">
+            <ion-label>Exklusivität</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="location">
+            <ion-label>Standort</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="type">
+            <ion-label>Art des Events</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+        <ion-label class="question-text">Wie mobil sind Sie für Events?</ion-label>
+        <ion-segment formControlName="mobility">
+          <ion-segment-button value="local">
+            <ion-label>Lokal</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="citywide">
+            <ion-label>Stadtweit</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="surrounding">
+            <ion-label>Umland</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="online">
+            <ion-label>Online</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+    </ion-list>
+    
+    <div class="ion-padding">
+      <ion-button type="submit" expand="block" color="secondary">Einstellungen speichern</ion-button>
+    </div>
+  </form>
+</ion-content>
