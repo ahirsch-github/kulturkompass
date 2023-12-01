@@ -1,4 +1,5 @@
-<ion-content [fullscreen]="true">
+<ion-content>
+  <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
     <ion-list>
     <!-- Loop durch jedes Event -->
     <ion-card *ngFor="let event of events?.events">
@@ -7,9 +8,7 @@
         <ion-card-title class="mouse-pointer">
           {{ event.attractions[0].referenceLabel.de }}
         </ion-card-title>
-        
       </ion-card-header>
-      
       <ion-card-content>
         <!-- Zeitplan -->
         <div>
@@ -39,7 +38,7 @@
       </ion-card-content>
     </ion-card>
   </ion-list>
-  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+  <ion-infinite-scroll *ngIf="allEventsListed === false" (ionInfinite)="onIonInfinite($event)">
     <ion-infinite-scroll-content loadingSpinner="bubbles">
     </ion-infinite-scroll-content>
   </ion-infinite-scroll>

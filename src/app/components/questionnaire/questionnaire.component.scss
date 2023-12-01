@@ -1,0 +1,31 @@
+.questionnaire-content {
+    background: none;
+    
+  }
+  
+.intro-text {
+  margin-bottom: 1.5rem;
+}
+
+.question-text {
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+  
+  .header-title {
+    font-size: 1.2em;
+    text-align: center;
+    color: #333;
+  }
+  
+  ion-segment-button {
+    --padding: 8px 14px;
+    --indicator-color: var(--ion-color-secondary);
+  }
+  
+  .submit-button {
+    --background: var(--ion-color-secondary);
+    --border-radius: 8px;
+    margin-top: 20px;
+  }
+  
