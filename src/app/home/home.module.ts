@@ -6,6 +6,7 @@ import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
 import { SharedModuleModule } from '../shared-module/shared-module.module';
+import { QuestionnaireComponent } from '../components/questionnaire/questionnaire.component';
 
 
 @NgModule({
