@@ -58,7 +58,6 @@ export class KulturdatenService {
   }
 
   getEventsByPage(page: number): Observable<any> {
-    console.log('getEventsByPage');
     return this.http.get(`${this.baseUrl}/events?page=${page}`)
       .pipe(
         catchError(this.handleError)
@@ -139,8 +138,14 @@ export class KulturdatenService {
       );
   }
 
-  getCoordinates(address: string): Observable<any> {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+  getCoordinates(street: string, city: string, postalCode: string): Observable<any> {
+    const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
+
+    const targetUrl = `https://nominatim.openstreetmap.org/search?street=${street.replace(/ /g, '+')}&city=${city.replace(/ /g, '+')}&postalcode=${postalCode}&format=json`;
+
+    const url = proxyUrl + targetUrl;
+
+    // const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
     return this.http.get<any[]>(url).pipe(
       map(results => {
         if (results.length > 0) {
@@ -154,7 +159,7 @@ export class KulturdatenService {
       })
     );
   }
-  
+
   getAllLocations(): Observable<any[]> {
     return this.getLocationsByPage(1).pipe(
       mergeMap(data => {
