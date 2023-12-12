@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { EventMapPageRoutingModule } from './event-map-routing.module';
 
 import { EventMapPage } from './event-map.page';
+import { SharedModuleModule } from '../shared-module/shared-module.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    EventMapPageRoutingModule
+    EventMapPageRoutingModule,
+    SharedModuleModule
   ],
   declarations: [EventMapPage]
 })

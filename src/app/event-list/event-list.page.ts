@@ -23,7 +23,7 @@ export class EventListPage implements OnInit {
     this.isFilteredFlag = false;
     this.idsToFilter = [];
     const page = this.eventPage + 1;
-    this.kulturdatenService.getEvents(page).subscribe(response => {
+    this.kulturdatenService.getEventsByPage(page).subscribe(response => {
       if (this.events && this.events.events) {
         this.events.events = [...this.events.events, ...response.data.events];
       } else {
