@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, tap } from 'rxjs/operators';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 
 @Injectable({
@@ -139,6 +139,7 @@ export class KulturdatenService {
   }
 
   getCoordinates(street: string, city: string, postalCode: string): Observable<any> {
+
     const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
 
     const targetUrl = `https://nominatim.openstreetmap.org/search?street=${street.replace(/ /g, '+')}&city=${city.replace(/ /g, '+')}&postalcode=${postalCode}&format=json`;
@@ -148,14 +149,14 @@ export class KulturdatenService {
     // const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
     return this.http.get<any[]>(url).pipe(
       map(results => {
-        if (results.length > 0) {
+        if (results && results.length > 0) {
           const firstResult = results[0];
           return {
             lat: firstResult.lat,
             lng: firstResult.lon
           };
         }
-        throw new Error('No results found');
+        return { lat: 0, lng: 0 }; // Beispiel für einen Standardwert
       })
     );
   }
@@ -216,6 +217,34 @@ export class KulturdatenService {
         catchError(this.handleError)
       );
   }
+
+  getEventsFilteredByChargeAndDay(isFree: boolean, isToday: boolean, isTomorrow: boolean): Observable<any> {
+    const date = new Date();
+    const today = date.toISOString().split('T')[0];
+    date.setDate(date.getDate() + 1);
+    const tomorrow = date.toISOString().split('T')[0];
+  
+    const filter: any = {};
+  
+    if (isFree) {
+      filter['admission.ticketType'] = 'ticketType.freeOfCharge';
+    }
+    if (isToday) {
+      filter['schedule.startDate'] = today;
+    } else if (isTomorrow) {
+      filter['schedule.startDate'] = tomorrow;
+    }
+  
+    const body = {
+      searchFilter: filter
+    };
+    console.log(body);
+    return this.http.post(`${this.baseUrl}/events/search?pageSize=300`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+  
 
   private handleError(error: any): String {
     console.error('Ein Fehler ist aufgetreten:', error);

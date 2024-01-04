@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import * as L from 'leaflet';
 import { KulturdatenService } from '../services/kulturdaten.service';
+import { switchMap, forkJoin } from 'rxjs';
+import { ModalController } from '@ionic/angular';
+import { LocationModalComponent } from '../components/location-modal/location-modal.component';
 
 @Component({
   selector: 'app-event-map',
@@ -10,7 +13,13 @@ import { KulturdatenService } from '../services/kulturdaten.service';
 
 export class EventMapPage implements OnInit {
   map: any;
-  constructor(private kulturdatenService: KulturdatenService) { }
+  constructor(private kulturdatenService: KulturdatenService, private modalController: ModalController) { }
+  coordinatesList: any[] = [];
+  bezirk = 'Mitte';
+  selectedLocation: any;
+  selectedRadius: number = 3;
+  currentCircle: L.Circle | undefined;
+  currentMarker: L.Marker | undefined;
   
   ngOnInit() {
   }
@@ -18,54 +27,122 @@ export class EventMapPage implements OnInit {
   ngAfterViewInit() {
     this.initMap();
     setTimeout(() => this.map.invalidateSize(), 0);
-    // this.loadLocationsAndSetMarkers();
+    this.applyFilters();
   }
 
-  private loadLocationsAndSetMarkers(): void {
-    console.log('loadLocationsAndSetMarkers');
-    this.kulturdatenService.getAllLocations().subscribe(locations => {
-      let i = 0;
-      locations.forEach((location: any) => {
-        if (i > 0) {
-          return;
-        }
-        i++;
-        console.log(location);
+  async openLocationModal() {
+    console.log('open location modal');
+    const modal = await this.modalController.create({
+      component: LocationModalComponent,
+      cssClass: 'half-height-modal',
+      componentProps: {
+        'selectedLocation': this.selectedLocation || [52.5200, 13.4050],
+        'selectedRadius': this.selectedRadius || 3
+      }
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      this.selectedLocation = data.location;
+      this.selectedRadius = data.radius;
+      console.log('new location', this.selectedLocation);
+      console.log('new radius', this.selectedRadius);
 
-        // lookup coordinates for 1. location
-        
+      if (this.map && this.selectedLocation && this.selectedRadius) {
+          if (this.currentMarker) {
+            this.map.removeLayer(this.currentMarker);
+          }
+          if (this.currentCircle) {
+            this.map.removeLayer(this.currentCircle);
+          }
+
+          this.currentMarker = L.marker(this.selectedLocation).addTo(this.map);
   
-        // Geocoding-Service aufrufen, um Koordinaten zu erhalten
-        this.kulturdatenService.getCoordinates("Schlossplatz 1, 10178 Berlin")
-          .subscribe(coordinates => {
-            console.log(coordinates);
-            const marker = L.marker([coordinates.lat, coordinates.lng]).addTo(this.map);
-            marker.bindPopup(location.title); // Ersetzen Sie location.title mit dem tatsächlichen Namen des Ortes
-          });
+          this.currentCircle = L.circle(this.selectedLocation, {
+            color: 'none',
+            fillColor: 'none',
+            fillOpacity: 0,
+            radius: (this.selectedRadius || 0) * 1000,
+            interactive: false
+          }).addTo(this.map);
+
+          const bounds = this.currentCircle.getBounds();
+          const zoomLevel = this.map.getBoundsZoom(bounds);
+        
+          this.map.setView(this.selectedLocation, zoomLevel);
+        }
+    }
+  }
+
+
+
+  isFree: boolean = false;
+  isToday: boolean = true;
+  isTomorrow: boolean = false;
+
+  onFreeFilterToggle(): void {
+    this.isFree = !this.isFree;
+    this.applyFilters();
+  }
+
+   onTodayFilterToggle(): void {
+    this.isToday = true;
+    this.isTomorrow = false;
+    this.applyFilters();
+  }
+
+  onTomorrowFilterToggle(): void {
+    this.isToday = false;
+    this.isTomorrow = true;
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    this.map.eachLayer((layer: any) => {
+      if (layer instanceof L.CircleMarker) {
+        this.map.removeLayer(layer);
+      }
+    });
+    this.coordinatesList = [];
+    this.kulturdatenService.getEventsFilteredByChargeAndDay(this.isFree, this.isToday, this.isTomorrow).subscribe(filteredEvents => {
+      const locationRequests = filteredEvents.data.events.map((event: any) => {
+        return this.kulturdatenService.getLocationById(event.locations[0].referenceId)
+          .pipe(
+            switchMap((response) => {
+              let location = response.data.location;
+              return this.kulturdatenService.getCoordinates(location.address.streetAddress, location.address.addressLocality, location.address.postalCode);
+            })
+          );
+      });
+
+      forkJoin(locationRequests).subscribe((results: any) => {
+        this.coordinatesList = results.filter((coordinates: { lat: number; lng: number; }) => coordinates.lat !== 0 || coordinates.lng !== 0);
+        this.setMarkers();
+        console.log(this.coordinatesList.length);
       });
     });
   }
-  
 
-  private loadEventsAndSetMarkers(): void {
-    console.log('loadEventsAndSetMarkers');
-    this.kulturdatenService.getAllEvents().subscribe(events => {
-      events.forEach((event: any) => {
-        console.log(event);
-        this.kulturdatenService.getLocationById(event.locations.referenceId).subscribe(location => {
-          // Nehmen Sie an, dass location Koordinaten in der Form { lat: number, lng: number } hat
-          const marker = L.marker([location.lat, location.lng]).addTo(this.map);
-          marker.bindPopup(event.name); // Ersetzen Sie event.name mit dem tatsächlichen Namen des Events
-        });
-      });
+  private setMarkers(): void {
+    console.log(this.coordinatesList);
+    this.coordinatesList.forEach((coord) => {
+      console.log(coord);
+      L.circleMarker(coord, {
+        radius: 8,
+        fillColor: "#473077",
+        color: "#000",
+        weight: 0,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(this.map);
     });
   }
 
   private initMap(): void {
-    // Center Map in Berlin
     this.map = L.map('map', {
       center: [52.5200, 13.4050], // Koordinaten von Berlin
-      zoom: 13
+      zoom: 13,
+      zoomControl: false,
     });
 
     const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -87,18 +164,24 @@ export class EventMapPage implements OnInit {
 
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
     var radius = e.accuracy;
+    this.selectedLocation = e.latlng;
 
-    L.marker(e.latlng).addTo(this.map)
-      .bindPopup("You are within " + radius + " meters from this point").openPopup();
-
-    L.circle(e.latlng, radius).addTo(this.map);
+    L.marker(e.latlng).addTo(this.map);
   }
 
   private onLocationError = (e: any) => {
-    // Log the error or inform the user
     console.error(e.message);
-
-    // Center and zoom the map on Berlin
+    this.selectedLocation = [52.5200, 13.4050];
     this.map.setView([52.5200, 13.4050], 13);
+  }
+
+  onSearchStart(data: any): void {
+    if (data === '') {
+      this.applyFilters();
+      return;
+    } else {
+      // TODO: Implememt search
+      this.applyFilters();
+    }
   }
 }

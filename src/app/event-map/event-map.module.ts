@@ -8,6 +8,7 @@ import { EventMapPageRoutingModule } from './event-map-routing.module';
 
 import { EventMapPage } from './event-map.page';
 import { SharedModuleModule } from '../shared-module/shared-module.module';
+import { LocationModalComponent } from '../components/location-modal/location-modal.component';
 
 @NgModule({
   imports: [
@@ -17,6 +18,6 @@ import { SharedModuleModule } from '../shared-module/shared-module.module';
     EventMapPageRoutingModule,
     SharedModuleModule
   ],
-  declarations: [EventMapPage]
+  declarations: [EventMapPage, LocationModalComponent]
 })
 export class EventMapPageModule {}

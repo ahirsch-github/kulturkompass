@@ -1,0 +1,70 @@
+#modal-map {
+    height: 100%;
+}
+
+.centered-container {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .navigation-icon {
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+    }
+
+    ion-item {
+        --background: var(--ion-toolbar-background);
+    }
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.font-weight-normal {
+    font-weight: normal;
+}
+
+ion-item {
+    --background-hover: none;
+}
+
+.center-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.range-slider {
+    --bar-height: 5px;
+    --bar-background: #e8e7ea;
+    --bar-background-active: #473077;
+}
+
+/* Ionic CSS */
+ion-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%; /* Optionale Anpassung, falls Sie die gesamte Höhe nutzen wollen */
+  }
+  
+  /* Ihr bestehendes CSS */
+  /* ... */
+  
+  .centered-title {
+    width: 100%; /* Stellt sicher, dass der Titel den gesamten verfügbaren Platz einnimmt */
+  }
+  
+  /* Hinzugefügt für den zentrierten Text im ion-title */
+  .ion-centered-text {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+  }
+  

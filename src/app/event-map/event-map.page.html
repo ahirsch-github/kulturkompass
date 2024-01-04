@@ -1,5 +1,36 @@
 <ion-content [fullscreen]="true">
+  <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
+  <div class="map-container">
+    <div class="search-radius-container" (click)="openLocationModal()">
+      <ion-label class="radius-title">Suchradius auswählen</ion-label>
+    </div>
+    <div class="filter-container">
+      <!-- Kostenlos-Filter -->
+      <button class="filter-button" [class.active]="isFree" (click)="onFreeFilterToggle()">
+        kostenlos
+      </button>
+      
+      <!-- Heute-Filter -->
+      <button class="filter-button" [class.active]="isToday" (click)="onTodayFilterToggle()">
+        heute
+      </button>
+      
+      <!-- Morgen-Filter -->
+      <button class="filter-button" [class.active]="isTomorrow" (click)="onTomorrowFilterToggle()">
+        morgen
+      </button>
+    </div>
     <div id="map" style="width: 100%; height: 100%;"></div>
-  </ion-content>
+    </div>
+    <!-- 
+    <ion-item class="radius-selection-container"  *ngIf="showRadiusSlider">
+      <ion-label class="radius-title">Suchradius auswählen</ion-label>
+      <ion-range min="1" max="30" step="1" value="3" (ionChange)="onRadiusChange($event)">
+        <ion-label slot="start">1 km</ion-label>
+        <ion-label slot="end">30 km</ion-label>
+      </ion-range>
+    </ion-item>
+    -->
+</ion-content>
   
 
