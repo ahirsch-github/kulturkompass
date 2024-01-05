@@ -17,13 +17,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Musik</ion-label>
-              <ion-checkbox value="music"></ion-checkbox>
+              <ion-checkbox value="music" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Theater</ion-label>
-              <ion-checkbox value="theater"></ion-checkbox>
+              <ion-checkbox value="theater" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -31,13 +31,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Sport</ion-label>
-              <ion-checkbox value="sports"></ion-checkbox>
+              <ion-checkbox value="sports" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Kunst</ion-label>
-              <ion-checkbox value="art"></ion-checkbox>
+              <ion-checkbox value="art" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -49,19 +49,19 @@
           <ion-col size="4">
             <ion-item>
               <ion-label>Teilnehmen</ion-label>
-              <ion-checkbox value="participate"></ion-checkbox>
+              <ion-checkbox value="participate" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="4">
             <ion-item>
               <ion-label>Konsumieren</ion-label>
-              <ion-checkbox value="consume"></ion-checkbox>
+              <ion-checkbox value="consume" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="4">
             <ion-item>
               <ion-label>Organisieren</ion-label>
-              <ion-checkbox value="organize"></ion-checkbox>
+              <ion-checkbox value="organize" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -73,13 +73,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Kostenlos</ion-label>
-              <ion-checkbox value="free"></ion-checkbox>
+              <ion-checkbox value="free" (ionChange)="onCheckboxChange($event, 'costs')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Für Geld</ion-label>
-              <ion-checkbox value="paid"></ion-checkbox>
+              <ion-checkbox value="paid" (ionChange)="onCheckboxChange($event, 'costs')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -91,13 +91,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Charlottenburg-Wilmersdorf</ion-label>
-              <ion-checkbox value="charlottenburg-wilmersdorf"></ion-checkbox>
+              <ion-checkbox value="charlottenburg-wilmersdorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Friedrichshain-Kreuzberg</ion-label>
-              <ion-checkbox value="friedrichshain-kreuzberg"></ion-checkbox>
+              <ion-checkbox value="friedrichshain-kreuzberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -105,13 +105,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Lichtenberg</ion-label>
-              <ion-checkbox value="lichtenberg"></ion-checkbox>
+              <ion-checkbox value="lichtenberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Marzahn-Hellersdorf</ion-label>
-              <ion-checkbox value="marzahn-hellersdorf"></ion-checkbox>
+              <ion-checkbox value="marzahn-hellersdorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -119,13 +119,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Mitte</ion-label>
-              <ion-checkbox value="mitte"></ion-checkbox>
+              <ion-checkbox value="mitte" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Neukölln</ion-label>
-              <ion-checkbox value="neukolln"></ion-checkbox>
+              <ion-checkbox value="neukolln" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -133,13 +133,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Pankow</ion-label>
-              <ion-checkbox value="pankow"></ion-checkbox>
+              <ion-checkbox value="pankow" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Reinickendorf</ion-label>
-              <ion-checkbox value="reinickendorf"></ion-checkbox>
+              <ion-checkbox value="reinickendorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -147,13 +147,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Spandau</ion-label>
-              <ion-checkbox value="spandau"></ion-checkbox>
+              <ion-checkbox value="spandau" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Steglitz-Zehlendorf</ion-label>
-              <ion-checkbox value="steglitz-zehlendorf"></ion-checkbox>
+              <ion-checkbox value="steglitz-zehlendorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -161,13 +161,13 @@
           <ion-col size="6">
             <ion-item>
               <ion-label>Tempelhof-Schöneberg</ion-label>
-              <ion-checkbox value="tempelhof-schoneberg"></ion-checkbox>
+              <ion-checkbox value="tempelhof-schoneberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label>Treptow-Köpenick</ion-label>
-              <ion-checkbox value="treptow-kopenick"></ion-checkbox>
+              <ion-checkbox value="treptow-kopenick" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
             </ion-item>
           </ion-col>
         </ion-row>

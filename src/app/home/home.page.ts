@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { QuestionnaireComponent } from '../components/questionnaire/questionnaire.component';
 import { ModalController } from '@ionic/angular';
 import { CookieService } from 'ngx-cookie-service';
+import { KulturdatenService } from '../services/kulturdaten.service';
+import { DatePipe } from '@angular/common';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 @Component({
@@ -10,27 +12,51 @@ import { FormGroup, FormBuilder } from '@angular/forms';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
-  eventCat: string | 'test' | undefined;
+  eventCat: { eventTopics?: string[], eventTypes?: string[], costs?: string[], districts?: string[] } | undefined = undefined;
+  events: any;
 
   constructor(
     private modalCtrl: ModalController,
     private cookieService: CookieService,
+    private kulturdatenService: KulturdatenService,
+    private datePipe: DatePipe,
   ) {}
 
   ngOnInit() {
     this.showQuestionnaireIfNeeded()
+    this.kulturdatenService.searchEvents({
+      "eventTopics": { "$in": this.eventCat?.eventTopics },
+      "eventTypes": { "$in": this.eventCat?.eventTypes },
+      "costs": { "$in": this.eventCat?.costs },
+      "districts": { "$in": this.eventCat?.districts }
+    }).subscribe(events => {
+      this.events = events;
+    });
+  }
+
+  formatDate(date: string): string {
+    return this.datePipe.transform(date, 'dd.MM.yyyy') || '';
+  }
+  
+  formatTime(time: string): string {
+    return time.substr(0, 5) || '';
   }
   
   private persolanizeEventCat() {
-    const preferences = this.cookieService.get('userType');
+    const userTypeCookie = this.cookieService.get('userType');
+    if (userTypeCookie) {
+      const preferences = JSON.parse(userTypeCookie);
       console.log('Preferences: ', preferences);
       this.eventCat = preferences;
+    } else {
+      console.log('userType cookie is not set');
+    }
   }
   
   private async showQuestionnaireIfNeeded() {
     console.log('Checking if questionnaire is needed');
     const isFirstTime = localStorage.getItem('hasVisited') === null;
-    if (isFirstTime) {
+    if (1==1) { //TODO: change to isFirstTime for production
       const modal = await this.modalCtrl.create({
       component: QuestionnaireComponent
     });
