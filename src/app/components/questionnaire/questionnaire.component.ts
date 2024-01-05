@@ -17,10 +17,10 @@ export class QuestionnaireComponent implements OnInit {
     private fb: FormBuilder
     ) {
       this.questionForm = this.fb.group({
-        eventType: [''],
-        frequency: [''],
-        priority: [''],
-        mobility: ['']
+        eventTopics: [''],
+        eventTypes: [''],
+        costs: [''],
+        districts: ['']
       });
     }
 
@@ -29,9 +29,9 @@ export class QuestionnaireComponent implements OnInit {
 
   submitAnswers() {
     console.log('Submitting answers');
-    const answers = this.questionForm.value;
+    const answers = this.questionForm.value.json();
     console.log(answers);
-    this.cookieService.set('userType', answers.eventType);
+    this.cookieService.set('userType', answers);
     localStorage.setItem('hasVisited', 'true');
     this.modalCtrl.dismiss();
   }
