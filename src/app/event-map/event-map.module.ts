@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
@@ -18,6 +18,7 @@ import { LocationModalComponent } from '../components/location-modal/location-mo
     EventMapPageRoutingModule,
     SharedModuleModule
   ],
-  declarations: [EventMapPage, LocationModalComponent]
+  declarations: [EventMapPage, LocationModalComponent],
+  providers: [DatePipe]
 })
 export class EventMapPageModule {}

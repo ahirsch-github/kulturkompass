@@ -1,24 +1,26 @@
 ion-content {
   --background: none transparent;
   --overflow: hidden; /* Verhindert Scrollen außerhalb der Karte */
-  height: 100%;
+  // height: 100%;
 }
 
 
 /* Styling für den übergeordneten Kartencontainer */
 .map-container {
-  position: relative; // Position relativ, um die Filter absolut innerhalb zu positionieren
+  position: relative;
+  height: calc(100% - 56px); /* Setzt die Höhe des Containers auf 100% des ion-content */
+  width: 100%;
 
   #map {
     height: 100%; /* Setzt die Höhe der Karte auf 100% des ion-content */
-    position: fixed !important;
+    position: fixed; /* Absolute Positionierung, um die Karte über den Filtern zu positionieren */
   }
 }
 
 /* Angepasstes Styling für den Filter-Container */
 .filter-container {
   position: absolute; // Absolute Positionierung
-  top: 45px; // Abstand von oben, passen Sie an, um über der Karte zu schweben
+  top: 65px; // Abstand von oben, passen Sie an, um über der Karte zu schweben
   left: 50%; // Zentrieren auf der X-Achse
   transform: translateX(-50%); // Verschiebung um die Hälfte seiner eigenen Breite nach links
   display: flex;
@@ -35,25 +37,36 @@ ion-content {
     cursor: pointer; // Cursor zum Klicken anzeigen
 
     &.active {
-      background-color: orange; // Grüne Hintergrundfarbe für aktive Filter
+      background-color: #ffbe3e; // Grüne Hintergrundfarbe für aktive Filter
       color: #fff; // Weiße Schriftfarbe für aktive Filter
-      border-color: #4CAF50; // Grüner Rand für aktive Filter
     }
   }
 }
 
 .search-radius-container {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--background-color);
+  opacity: 0.75;
   padding: 10px;
   width: 100%;
   z-index: 1000;
   cursor: pointer;
 
   .radius-title {
-    color: #000;
     font-weight: bold;
     margin-left: 10px;
+    display: flex;
+  }
+
+  
+  .is-small {
+    font-size: 0.9em;
+    font-weight: lighter;
+  }
+
+  .title {
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -72,9 +85,7 @@ ion-content {
   --border-radius: 20px 20px 0 0; /* Abgerundete Ecken oben */
 }
 
-.radius-slider-modal {
-  --height: 50% !important; /* Setzt die Höhe des Modals auf 50% des Bildschirms */
-  --top: 50%; /* Positioniert das Modal in der Mitte des Bildschirms */
-  --max-height: 50% !important; /* Stellt sicher, dass das Modal nicht größer als 50% wird */
-  --border-radius: 20px 20px 0 0; 
+.padding-top {
+  padding-top: 2px;
+  padding-left: 3px;
 }

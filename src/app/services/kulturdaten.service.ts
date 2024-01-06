@@ -22,41 +22,6 @@ export class KulturdatenService {
       );
   }
 
-  getAllEvents(): Observable<any[]> {
-    return this.getEventsByPage(1).pipe(
-      mergeMap(data => {
-        const totalPages = Math.ceil(data.data.totalCount / 30); // Berechnen der Gesamtseitenzahl
-        const pageRequests: Observable<any>[] = [];
-        console.log(pageRequests);
-        for (let i = 2; i <= totalPages/50; i++) {
-          pageRequests.push(this.getEventsByPage(i));
-        }
-
-        return forkJoin([of(data), ...pageRequests]).pipe(
-          map(results => {
-            return results.reduce((acc, response) => {
-              // Prüfen, ob die Antwort das erwartete Format hat
-              if (response.success && response.data && Array.isArray(response.data.events)) {
-                return [...acc, ...response.data.events];
-              } else {
-                console.error('Unexpected response format:', response);
-                return acc;
-              }
-            }, []);
-          }),
-          catchError(err => {
-            console.error('Error fetching events:', err);
-            return of([]); // Sie könnten hier auch throwError verwenden, um den Fehler an die Komponente weiterzugeben.
-          })
-        );
-      }),
-      catchError(err => {
-        console.error('Error fetching the first page of events:', err);
-        return throwError(err); // Fehler an die Komponente weiterleiten
-      })
-    );
-  }
-
   getEventsByPage(page: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/events?page=${page}`)
       .pipe(
@@ -146,7 +111,6 @@ export class KulturdatenService {
 
     const url = proxyUrl + targetUrl;
 
-    // const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
     return this.http.get<any[]>(url).pipe(
       map(results => {
         if (results && results.length > 0) {
@@ -156,42 +120,7 @@ export class KulturdatenService {
             lng: firstResult.lon
           };
         }
-        return { lat: 0, lng: 0 }; // Beispiel für einen Standardwert
-      })
-    );
-  }
-
-  getAllLocations(): Observable<any[]> {
-    return this.getLocationsByPage(1).pipe(
-      mergeMap(data => {
-        const totalPages = Math.ceil(data.data.totalCount / 30); // Berechnen der Gesamtseitenzahl
-        const pageRequests: Observable<any>[] = [];
-        console.log(pageRequests);
-        for (let i = 2; i <= totalPages; i++) {
-          pageRequests.push(this.getLocationsByPage(i));
-        }
-
-        return forkJoin([of(data), ...pageRequests]).pipe(
-          map(results => {
-            return results.reduce((acc, response) => {
-              // Prüfen, ob die Antwort das erwartete Format hat
-              if (response.success && response.data && Array.isArray(response.data.locations)) {
-                return [...acc, ...response.data.locations];
-              } else {
-                console.error('Unexpected response format:', response);
-                return acc;
-              }
-            }, []);
-          }),
-          catchError(err => {
-            console.error('Error fetching locations:', err);
-            return of([]); // Sie könnten hier auch throwError verwenden, um den Fehler an die Komponente weiterzugeben.
-          })
-        );
-      }),
-      catchError(err => {
-        console.error('Error fetching the first page of locations:', err);
-        return throwError(err); // Fehler an die Komponente weiterleiten
+        return { lat: 0, lng: 0 };
       })
     );
   }
@@ -238,7 +167,6 @@ export class KulturdatenService {
     const body = {
       searchFilter: filter
     };
-    console.log(body);
     return this.http.post(`${this.baseUrl}/events/search?pageSize=300`, body, { headers: this.headers })
       .pipe(
         catchError(this.handleError)

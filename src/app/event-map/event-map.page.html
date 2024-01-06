@@ -2,7 +2,10 @@
   <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
   <div class="map-container">
     <div class="search-radius-container" (click)="openLocationModal()">
-      <ion-label class="radius-title">Suchradius auswählen</ion-label>
+      <div class="title">
+        <ion-label class="radius-title"> {{ this.bezirk }}, Berlin <ion-icon class="padding-top" name="chevron-down-outline"></ion-icon></ion-label>
+        <ion-label class="radius-title is-small"> im Umkreis von {{ this.selectedRadius }} km</ion-label>
+      </div>
     </div>
     <div class="filter-container">
       <!-- Kostenlos-Filter -->
@@ -22,15 +25,6 @@
     </div>
     <div id="map" style="width: 100%; height: 100%;"></div>
     </div>
-    <!-- 
-    <ion-item class="radius-selection-container"  *ngIf="showRadiusSlider">
-      <ion-label class="radius-title">Suchradius auswählen</ion-label>
-      <ion-range min="1" max="30" step="1" value="3" (ionChange)="onRadiusChange($event)">
-        <ion-label slot="start">1 km</ion-label>
-        <ion-label slot="end">30 km</ion-label>
-      </ion-range>
-    </ion-item>
-    -->
 </ion-content>
   
 

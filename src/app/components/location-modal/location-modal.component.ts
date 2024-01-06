@@ -1,7 +1,7 @@
 import { ModalController } from '@ionic/angular';
 import { Component, Input, OnInit } from '@angular/core';
 import * as L from 'leaflet';
-import { BerlinBezirkeLatLng } from 'src/app/enums/berlin-bezirke';
+import { BerlinBezirkeLatLng } from 'src/app/enums/berlin-bezirke-latlng';
 
 @Component({
   selector: 'app-location-modal',
@@ -77,6 +77,7 @@ export class LocationModalComponent implements OnInit {
       this.map.removeLayer(this.currentCircle);
     }
   
+    // TODO: make Marker #473077 and more matching to the design
     this.currentMarker = L.marker(location).addTo(this.map);
   
     this.currentCircle = L.circle(location, {
@@ -129,39 +130,36 @@ export class LocationModalComponent implements OnInit {
   }
 
   onMapClick(e: L.LeafletMouseEvent): void {
-    console.log(e.latlng);
     this.selectedLocation = e.latlng;
   }
 
   onSelectionChange(event: any): void {
-    console.log(event.detail.value);
-
     let bezirkkey = event.detail.value;
 
     if (bezirkkey === 'mitte') {
-      this.selectedLocation = [52.5200, 13.4050];
+      this.selectedLocation = BerlinBezirkeLatLng['mitte'] as L.LatLngExpression;
     } else if (bezirkkey === 'friedrichshain') {
-      this.selectedLocation = [52.5159, 13.4544];
+      this.selectedLocation = BerlinBezirkeLatLng['friedrichshain'] as L.LatLngExpression;
     } else if (bezirkkey === 'pankow') {
-      this.selectedLocation = [52.5975, 13.4361];
+      this.selectedLocation = BerlinBezirkeLatLng['pankow'] as L.LatLngExpression;
     } else if (bezirkkey === 'charlottenburg') {
-      this.selectedLocation = [52.5167, 13.2833];
+      this.selectedLocation = BerlinBezirkeLatLng['charlottenburg'] as L.LatLngExpression;
     } else if (bezirkkey === 'spandau') {
-      this.selectedLocation = [52.5354, 13.1976];
+      this.selectedLocation = BerlinBezirkeLatLng['spandau'] as L.LatLngExpression;
     } else if (bezirkkey === 'steglitz') {
-      this.selectedLocation = [52.4333, 13.3333];
+      this.selectedLocation = BerlinBezirkeLatLng['steglitz'] as L.LatLngExpression;
     } else if (bezirkkey === 'tempelhof') {
-      this.selectedLocation = [52.4667, 13.3833];
+      this.selectedLocation = BerlinBezirkeLatLng['tempelhof'] as L.LatLngExpression;
     } else if (bezirkkey === 'neukoelln') {
-      this.selectedLocation = [52.4811, 13.4350];
+      this.selectedLocation = BerlinBezirkeLatLng['neukoelln'] as L.LatLngExpression;
     } else if (bezirkkey === 'treptow') {
-      this.selectedLocation = [52.4933, 13.4558];
+      this.selectedLocation = BerlinBezirkeLatLng['treptow'] as L.LatLngExpression;
     } else if (bezirkkey === 'marzahn') {
-      this.selectedLocation = [52.5333, 13.5667];
+      this.selectedLocation = BerlinBezirkeLatLng['marzahn'] as L.LatLngExpression;
     } else if (bezirkkey === 'lichtenberg') {
-      this.selectedLocation = [52.5333, 13.4833];
+      this.selectedLocation = BerlinBezirkeLatLng['lichtenberg'] as L.LatLngExpression;
     } else if (bezirkkey === 'reinickendorf') {
-      this.selectedLocation = [52.5667, 13.3333];
+      this.selectedLocation = BerlinBezirkeLatLng['reinickendorf'] as L.LatLngExpression;
     }
     this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
   }
