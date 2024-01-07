@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { AttractionTags } from '../../enums/attraction-tags';
 import { LocationTags } from '../../enums/location-tags';
+import { LocationModalComponent } from '../location-modal/location-modal.component';
 
 @Component({
   selector: 'app-filter-menu',
@@ -71,8 +72,11 @@ export class FilterMenuComponent  implements OnInit {
   selectedDistricts: any[] = [];
   selectedDates: any[] = [];
   selectedTimes: any[] = [];
+  selectedLocation: any;
+  selectedRadius: any;
 
   @Input() filters: any;
+  defaultLocation: any = [52.5200, 13.4050];
 
   constructor(private modalCtrl: ModalController) { }
 
@@ -116,7 +120,9 @@ export class FilterMenuComponent  implements OnInit {
       'selectedCategories': this.selectedCategories,
       'selectedDistricts': this.selectedDistricts,
       'selectedAccessibilities': this.selectedAccessibilities,
-      'isFreeOfChargeSelected': this.isFreeOfChargeSelected
+      'isFreeOfChargeSelected': this.isFreeOfChargeSelected,
+      'selectedLocation': this.selectedLocation,
+      'selectedRadius': this.selectedRadius,
     });
   }
 
@@ -143,6 +149,26 @@ export class FilterMenuComponent  implements OnInit {
       return o2.some(o => o.name === o1.name);
     }
     return o1 && o2 ? o1.name === o2.name : o1 === o2;
+  }
+
+  async openLocationSelectionModal() {
+    console.log('openLocationSelectionModal');
+    const modal = await this.modalCtrl.create({
+      component: LocationModalComponent,
+      cssClass: 'half-height-modal',
+      componentProps: {
+        'selectedLocation': this.defaultLocation,
+        'selectedRadius': 3,
+        'showDistrictFilter': false,
+      }
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      this.selectedLocation = data.location;
+      this.selectedRadius = data.radius;
+    }
+    console.log(data);
   }
 
 }
