@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Filter</ion-title>
+    <!-- <ion-buttons slot="end">
+      <ion-icon name="close" (click)="closeModal()"></ion-icon>
+    </ion-buttons> -->
+  </ion-toolbar>
+</ion-header>
+<ion-content class="filter-menu ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-icon name="pin" slot="start"></ion-icon>
+      <ion-label>Ort</ion-label>
+      <ion-label slot="end">Alle</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-icon name="calendar" slot="start"></ion-icon>
+      <ion-label>Datum</ion-label>
+      <ion-datetime-button slot="end" datetime="datetime" presentation="date"></ion-datetime-button>
+    </ion-item>
+    <ion-item>
+      <ion-icon name="time" slot="start"></ion-icon>
+      <ion-select [(ngModel)]="selectedTimes" interface="popover" label="Tageszeit" (ionChange)="handleTimeChange($event)" [multiple]="true" [compareWith]="compareWithDt">
+        <ion-select-option *ngFor="let time of times" [value]="time">
+          {{ time.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-icon name="pricetag" slot="start"></ion-icon>
+      <ion-label>Nur kostenlos</ion-label>
+      <ion-toggle [(ngModel)]="isFreeOfChargeSelected" (ionChange)="handlePriceChange($event)" aria-label="Nur kostenlos" label ="Nur kostenlos" slot="end"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-icon name="pin" slot="start"></ion-icon>
+      <ion-select [(ngModel)]="selectedDistricts" (ionChange)="handleDistrictChange($event)" label="Bezirk" interface="popover" [multiple]="true" [compareWith]="compareWithFn">
+        <ion-select-option *ngFor="let district of districts" [value]="district">
+          {{ district.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-icon name="receipt-outline" slot="start"></ion-icon>
+      <ion-select [(ngModel)]="selectedCategories" (ionChange)="handleCategoryChange($event)" interface="popover" label="Kategorie" [multiple]="true" [compareWith]="compareWith">
+        <ion-select-option *ngFor="let category of categories" [value]="category">
+          {{ category.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-icon name="accessibility-outline" slot="start"></ion-icon>
+      <ion-select [(ngModel)]="selectedAccessibilities" label="Barrierefreiheit" interface="popover" (ionChange)="handleAccessibilityChange($event)" [multiple]="true" [compareWith]="compareWith">
+        <ion-select-option *ngFor="let accessibility of accessibilities" [value]="accessibility">
+          {{ accessibility.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  <ion-button expand="block" class="ion-padding" (click)="applyFilters()">Filter anwenden</ion-button>
+</ion-content>
+<ion-modal [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime [(ngModel)]="selectedDates" id="datetime" (ionChange)="handleDateChange($event)" [multiple]="true" presentation="date" [value]="selectedDates">
+    </ion-datetime>
+  </ng-template>
+</ion-modal>
