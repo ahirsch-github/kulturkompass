@@ -23,13 +23,20 @@ export class HomePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.showQuestionnaireIfNeeded()
+    this.showQuestionnaireIfNeeded();
+    this.loadEvents();
+  }
+
+  loadEvents() {
     const body = {inTheFuture:true, };
     this.kulturdatenService.getFutureEvents(278, body).subscribe(events => {
-      this.events = events;
+      this.events = events.data.events;
+      if (this.eventCat && this.eventCat.costs && this.eventCat.costs.includes('free')) {
+        console.log('EventType: ', "free");
+        this.events = this.events.filter((event: any) => event.admission && event.admission.ticketType === 'ticketType.freeOfCharge');
+      }
       console.log('Events: ', this.events);
     });
-
   }
 
   formatDate(date: string): string {
@@ -56,14 +63,15 @@ export class HomePage implements OnInit {
     const isFirstTime = localStorage.getItem('hasVisited') === null;
     if (1==1) { //TODO: change to isFirstTime for production
       const modal = await this.modalCtrl.create({
-      component: QuestionnaireComponent
-    });
+        component: QuestionnaireComponent
+      });
     
-    modal.onDidDismiss().then((data) => {
-      this.persolanizeEventCat();
-    });
+      modal.onDidDismiss().then((data) => {
+        this.persolanizeEventCat();
+        this.loadEvents(); // reload the events after the questionnaire is dismissed
+      });
 
-    return await modal.present();
+      return await modal.present();
     } else {
       this.persolanizeEventCat();
     }
