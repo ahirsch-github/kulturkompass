@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { KulturdatenService } from '../services/kulturdaten.service';
-import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, IonMenu, MenuController, ModalController } from '@ionic/angular';
 import { DatePipe } from '@angular/common';
+import { FilterMenuComponent } from '../components/filter-menu/filter-menu.component';
 
 @Component({
   selector: 'app-event-list',
@@ -17,13 +18,106 @@ export class EventListPage implements OnInit {
   numberOfEvents = 0;
   attractions: any;
   searchTerm = '';
-  constructor(private kulturdatenService: KulturdatenService, private datePipe: DatePipe) { }
+  constructor(private menu: MenuController, private kulturdatenService: KulturdatenService, private datePipe: DatePipe, private modalControlle: ModalController) { 
+  }
+
+  filters = {
+    dates: [],
+    times: [],
+    categories: [],
+    accessibilities: [],
+    districts: [{}],
+    isFreeOfChargeSelected: false,
+    selectedLocation: null,
+    selectedRadius: 0,
+  };
+  selectedDistrictNames: string[] = [];
+  selectedCategoryNames: string[] = [];
+  selectedAccessibilityNames: string[] = [];
+  selectedTimeNames: string[] = [];
+
+  async openFilterMenuModal() {
+    const modal = await this.modalControlle.create({
+      component: FilterMenuComponent,
+      cssClass: 'filter-menu-modal',
+      componentProps: {
+        filters: this.filters
+      }
+    });
+    await modal.present();
+    modal.onDidDismiss().then((dataReturned) => {
+      if (dataReturned.data) {
+        this.filters.dates = dataReturned.data.selectedDates;
+        this.filters.times = dataReturned.data.selectedTimes;
+        this.filters.categories = dataReturned.data.selectedCategories;
+        this.filters.accessibilities = dataReturned.data.selectedAccessibilities;
+        this.filters.districts = dataReturned.data.selectedDistricts;
+        this.filters.isFreeOfChargeSelected = dataReturned.data.isFreeOfChargeSelected;
+        this.filters.selectedLocation = dataReturned.data.selectedLocation;
+        this.filters.selectedRadius = dataReturned.data.selectedRadius;
+
+        this.selectedDistrictNames = [];
+        this.filters.districts.forEach((district: any) => {
+          if(district.name) this.selectedDistrictNames.push(district.name);
+        });
+
+        this.selectedCategoryNames = [];
+        this.filters.categories.forEach((category: any) => {
+          this.selectedCategoryNames.push(category.name);
+        });
+
+        this.selectedAccessibilityNames = [];
+        this.filters.accessibilities.forEach((accessibility: any) => {
+          this.selectedAccessibilityNames.push(accessibility.name);
+        });
+
+        this.selectedTimeNames = [];
+        this.filters.times.forEach((time: any) => {
+          this.selectedTimeNames.push(time.name);
+        });
+      }
+    });
+  }
+
+  removeDistrict(district: any): void {
+    this.filters.districts = this.filters.districts.filter((d: any) => {
+      return d.name !== district;
+    });
+    this.selectedDistrictNames = this.selectedDistrictNames.filter((name: string) => name !== district);
+  }
+  
+  removeTime(time: any): void {
+    this.filters.times = this.filters.times.filter((t: any) => {
+      return t.name !== time;
+    });
+    this.selectedTimeNames = this.selectedTimeNames.filter((name: string) => name !== time);
+  }
+
+  removeCategory(category: any): void {
+    this.filters.categories = this.filters.categories.filter((c: any) => {
+      return c.name !== category;
+    });
+    this.selectedCategoryNames = this.selectedCategoryNames.filter((name: string) => name !== category);
+  }
+
+  removeDate(): void {
+      this.filters.dates = [];
+  }
+
+  removeAccessibility(): void {
+      this.filters.accessibilities = [];
+      this.selectedAccessibilityNames = [];
+  }
+
+  removeFreeOfCharge(): void {
+    this.filters.isFreeOfChargeSelected = false;
+  }
 
   private loadEvents(): void {
     this.isFilteredFlag = false;
     this.idsToFilter = [];
     const page = this.eventPage + 1;
-    this.kulturdatenService.getEvents(page).subscribe(response => {
+    this.kulturdatenService.getEventsByPage(page).subscribe(response => {
       if (this.events && this.events.events) {
         this.events.events = [...this.events.events, ...response.data.events];
       } else {
@@ -43,15 +137,16 @@ export class EventListPage implements OnInit {
     this.eventPage = 0;
     this.loadEvents();
   }
-
+  
   onIonInfinite(ev: InfiniteScrollCustomEvent) {
     if(this.allEventsListed) {
       return;
     }
     if(this.isFilteredFlag) {
-      this.searchAttractionsbyTerm(this.searchTerm);
+      this.loadFilteredEvents();
+    } else {
+      this.loadEvents();
     }
-    this.loadEvents();
     setTimeout(() => {
       (ev as InfiniteScrollCustomEvent).target.complete();
     }, 500);
@@ -66,12 +161,13 @@ export class EventListPage implements OnInit {
       console.error('Ein Fehler ist aufgetreten:', error);
     });
   }
-  
+
   onSearchStart(data: any): void {
     if (data === '') {
       this.events = null;
       this.eventPage = 0;
       this.allEventsListed = false;
+      this.isFilteredFlag = false;
       this.loadEvents();
       return;
     }
@@ -87,12 +183,17 @@ export class EventListPage implements OnInit {
 
   loadFilteredEvents(): void {
     this.kulturdatenService.getEventsByAttractionIds(this.idsToFilter, this.eventPage).subscribe(response => {
-      this.events = response.data;
+      if (this.eventPage === 1) {
+        this.events = response.data;
+      } else {
+        this.events.events = [...this.events.events, ...response.data.events];
+      }
       this.isFilteredFlag = true;
-      if(response.data.totalCount / 30 <= this.eventPage) {
+      if(Math.ceil(response.data.totalCount / 30) == this.eventPage) {
         this.allEventsListed = true;
         console.log('All events listed');
       }
+      this.eventPage++;
     }, error => {
       console.error('Ein Fehler ist aufgetreten:', error);
     });
@@ -101,7 +202,7 @@ export class EventListPage implements OnInit {
   formatDate(date: string): string {
     return this.datePipe.transform(date, 'dd.MM.yyyy') || '';
   }
-  
+
   formatTime(time: string): string {
     return time.substr(0, 5) || '';
   }

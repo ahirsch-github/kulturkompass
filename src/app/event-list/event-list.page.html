@@ -1,45 +1,91 @@
-<ion-content>
-  <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
-    <ion-list>
-    <!-- Loop durch jedes Event -->
-    <ion-card *ngFor="let event of events?.events">
-      <!-- Titel des Events -->
-      <ion-card-header>
-        <ion-card-title class="mouse-pointer">
-          {{ event.attractions[0].referenceLabel.de }}
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <!-- Zeitplan -->
-        <div>
-          <strong>Datum:</strong> {{ formatDate(event.schedule.startDate) }}
-          <ng-container *ngIf="event.schedule.startDate !== event.schedule.endDate">
-            - {{ formatDate(event.schedule.endDate) }}
-          </ng-container>          </div>
-        <div>
-          <strong>Zeit:</strong> 
-          <ng-container *ngIf="event.schedule.startTime === '00:00:00' && event.schedule.endTime === '00:00:00'">
-            Ganztägig
+  <ion-content id="main-content">
+    <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start" class="badge-container">
+          <ion-badge style="cursor: pointer;" (click)="openFilterMenuModal()">
+            <ion-icon class="icon-margin-right" name="options"></ion-icon>
+            Filter
+          </ion-badge>
+          <ng-container *ngIf="selectedDistrictNames.length > 0">
+            <ion-badge *ngFor="let district of selectedDistrictNames" color="secondary">
+              {{ district }}
+              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeDistrict(district)"></ion-icon>
+            </ion-badge>
           </ng-container>
-          <ng-container *ngIf="event.schedule.startTime !== '00:00:00' || event.schedule.endTime !== '00:00:00'">
-            {{ formatTime(event.schedule.startTime) }} - {{ formatTime(event.schedule.endTime) }}
+          <ng-container *ngIf="selectedCategoryNames.length > 0">
+            <ion-badge *ngFor="let category of selectedCategoryNames" color="secondary">
+              {{ category }}
+              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeCategory(category)"></ion-icon>
+            </ion-badge>
           </ng-container>
-        </div>
-        
-        <!-- Ort -->
-        <div class="mouse-pointer">
-          <strong>Ort:</strong> {{ event.locations[0].referenceLabel.de }}
-        </div>
+          <ng-container *ngIf="filters.dates.length > 0">
+            <ion-badge color="secondary">
+              Datum
+              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeDate()"></ion-icon>
+            </ion-badge>
+          </ng-container>
+          <ng-container *ngIf="selectedTimeNames.length > 0">
+            <ion-badge *ngFor="let time of selectedTimeNames" color="secondary">
+              {{ time }}
+              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeTime(time)"></ion-icon>
+            </ion-badge>
+          </ng-container>
+          <ng-container *ngIf="selectedAccessibilityNames.length > 0">
+            <ion-badge color="secondary">
+              Barrierefrei
+              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeAccessibility()"></ion-icon>
+            </ion-badge>
+          </ng-container>
+          <ng-container *ngIf="filters.isFreeOfChargeSelected">
+            <ion-badge color="secondary">
+              Kostenlos
+              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeFreeOfCharge()"></ion-icon>
+            </ion-badge>
+          </ng-container>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+      <ion-list>
+      <!-- Loop durch jedes Event -->
+      <ion-card *ngFor="let event of events?.events">
+        <!-- Titel des Events -->
+        <ion-card-header>
+          <ion-card-title class="mouse-pointer">
+            {{ event.attractions[0].referenceLabel.de }}
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <!-- Zeitplan -->
+          <div>
+            <strong>Datum:</strong> {{ formatDate(event.schedule.startDate) }}
+            <ng-container *ngIf="event.schedule.startDate !== event.schedule.endDate">
+              - {{ formatDate(event.schedule.endDate) }}
+            </ng-container>          </div>
+          <div>
+            <strong>Zeit:</strong> 
+            <ng-container *ngIf="event.schedule.startTime === '00:00:00' && event.schedule.endTime === '00:00:00'">
+              Ganztägig
+            </ng-container>
+            <ng-container *ngIf="event.schedule.startTime !== '00:00:00' || event.schedule.endTime !== '00:00:00'">
+              {{ formatTime(event.schedule.startTime) }} - {{ formatTime(event.schedule.endTime) }}
+            </ng-container>
+          </div>
+          
+          <!-- Ort -->
+          <div class="mouse-pointer">
+            <strong>Ort:</strong> {{ event.locations[0].referenceLabel.de }}
+          </div>
 
-        <!-- Eintrittspreis (falls vorhanden) -->
-        <div *ngIf="event.admission && event.admission.ticketType === 'ticketType.freeOfCharge'">
-            <strong>Eintritt:</strong> Kostenlos
-        </div>
-      </ion-card-content>
-    </ion-card>
-  </ion-list>
-  <ion-infinite-scroll *ngIf="allEventsListed === false" (ionInfinite)="onIonInfinite($event)">
-    <ion-infinite-scroll-content loadingSpinner="bubbles">
-    </ion-infinite-scroll-content>
-  </ion-infinite-scroll>
-</ion-content>
+          <!-- Eintrittspreis (falls vorhanden) -->
+          <div *ngIf="event.admission && event.admission.ticketType === 'ticketType.freeOfCharge'">
+              <strong>Eintritt:</strong> Kostenlos
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+    <ion-infinite-scroll *ngIf="allEventsListed === false" (ionInfinite)="onIonInfinite($event)">
+      <ion-infinite-scroll-content loadingSpinner="bubbles">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-content>

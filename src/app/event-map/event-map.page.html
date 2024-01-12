@@ -1,5 +1,30 @@
 <ion-content [fullscreen]="true">
+  <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
+  <div class="map-container">
+    <div class="search-radius-container" (click)="openLocationModal()">
+      <div class="title">
+        <ion-label class="radius-title"> {{ this.bezirk }}, Berlin <ion-icon class="padding-top" name="chevron-down-outline"></ion-icon></ion-label>
+        <ion-label class="radius-title is-small"> im Umkreis von {{ this.selectedRadius }} km</ion-label>
+      </div>
+    </div>
+    <div class="filter-container">
+      <!-- Kostenlos-Filter -->
+      <button class="filter-button" [class.active]="isFree" (click)="onFreeFilterToggle()">
+        kostenlos
+      </button>
+      
+      <!-- Heute-Filter -->
+      <button class="filter-button" [class.active]="isToday" (click)="onTodayFilterToggle()">
+        heute
+      </button>
+      
+      <!-- Morgen-Filter -->
+      <button class="filter-button" [class.active]="isTomorrow" (click)="onTomorrowFilterToggle()">
+        morgen
+      </button>
+    </div>
     <div id="map" style="width: 100%; height: 100%;"></div>
-  </ion-content>
+    </div>
+</ion-content>
   
 
