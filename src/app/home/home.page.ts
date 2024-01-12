@@ -24,14 +24,12 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
     this.showQuestionnaireIfNeeded()
-    this.kulturdatenService.searchEvents({
-      "eventTopics": { "$in": this.eventCat?.eventTopics },
-      "eventTypes": { "$in": this.eventCat?.eventTypes },
-      "costs": { "$in": this.eventCat?.costs },
-      "districts": { "$in": this.eventCat?.districts }
-    }).subscribe(events => {
+    const body = {inTheFuture:true, };
+    this.kulturdatenService.getFutureEvents(278, body).subscribe(events => {
       this.events = events;
+      console.log('Events: ', this.events);
     });
+
   }
 
   formatDate(date: string): string {
