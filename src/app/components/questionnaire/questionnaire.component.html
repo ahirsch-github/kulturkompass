@@ -4,10 +4,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" [fullscreen]="true">
+<ion-content class="ion-padding" [fullscreen]="true" color="medium">
   <form (ngSubmit)="submitAnswers()" [formGroup]="questionForm">
     <ion-list lines="none" class="questionnaire-content">
-      <ion-label class="intro-text">
+      <ion-label class="intro-text" color="primary">
         <p>Um die Benutzererfahrung zu verbessern, bitten wir Sie, einige Fragen zu beantworten.</p>
       </ion-label>
         <ion-label class="question-text">Welcher Veranstaltungen interessieren Sie?</ion-label>

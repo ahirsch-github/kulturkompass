@@ -2,22 +2,22 @@
   <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
     <ion-list>
     <!-- Loop durch jedes Event -->
-    <ion-card *ngFor="let event of events?.events">
+    <ion-card *ngFor="let event of events?.events" color="primary">
       <!-- Titel des Events -->
       <ion-card-header>
-        <ion-card-title class="mouse-pointer">
+        <ion-card-title class="mouse-pointer" color="secondary">
           {{ event.attractions[0].referenceLabel.de }}
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <!-- Zeitplan -->
         <div>
-          <strong>Datum:</strong> {{ formatDate(event.schedule.startDate) }}
+          <strong color="secondary">Datum:</strong> {{ formatDate(event.schedule.startDate) }}
           <ng-container *ngIf="event.schedule.startDate !== event.schedule.endDate">
             - {{ formatDate(event.schedule.endDate) }}
           </ng-container>          </div>
         <div>
-          <strong>Zeit:</strong> 
+          <strong color="secondary">Zeit:</strong> 
           <ng-container *ngIf="event.schedule.startTime === '00:00:00' && event.schedule.endTime === '00:00:00'">
             Ganztägig
           </ng-container>
