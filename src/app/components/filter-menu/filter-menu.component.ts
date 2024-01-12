@@ -130,6 +130,17 @@ export class FilterMenuComponent  implements OnInit {
     this.modalCtrl.dismiss();
   }
 
+  resetFilters() {
+    this.selectedAccessibilities = [];
+    this.selectedCategories = [];
+    this.selectedDistricts = [];
+    this.selectedDates = [];
+    this.selectedTimes = [];
+    this.isFreeOfChargeSelected = false;
+    this.selectedLocation = null;
+    this.selectedRadius = null;
+  }
+
   compareWith(o1: any, o2: any) {
     if (!o1 || !o2) {
       return o1 === o2;
@@ -168,7 +179,6 @@ export class FilterMenuComponent  implements OnInit {
       this.selectedLocation = data.location;
       this.selectedRadius = data.radius;
     }
-    console.log(data);
   }
 
 }

@@ -57,6 +57,9 @@
     </ion-item>
   </ion-list>
   <ion-button expand="block" class="ion-padding" (click)="applyFilters()">Filter anwenden</ion-button>
+  <ion-button style="--background: none;" fill="clear" expand="block" class="ion-padding" (click)="resetFilters()">
+    <ion-icon name="trash-outline" slot="start"></ion-icon>
+    Filter zurücksetzen</ion-button>
 </ion-content>
 <ion-modal [keepContentsMounted]="true">
   <ng-template>
