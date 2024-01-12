@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { HttpClientModule } from '@angular/common/http';
 import { KulturdatenService } from '../services/kulturdaten.service';
-import { TabsPageModule } from '../tabs/tabs.module';
 
 
 
