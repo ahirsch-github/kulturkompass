@@ -7,6 +7,8 @@ import { LocationModalComponent } from '../components/location-modal/location-mo
 import { BerlinBezirkeLatLng } from '../enums/berlin-bezirke-latlng';
 import { BerlinBezirke } from '../enums/berlin-bezirke';
 import { DatePipe } from '@angular/common';
+import 'leaflet.markercluster';
+import { MarkerClusterGroup } from 'leaflet';
 
 @Component({
   selector: 'app-event-map',
@@ -28,6 +30,8 @@ export class EventMapPage implements OnInit {
   isFree: boolean = false;
   isToday: boolean = true;
   isTomorrow: boolean = false;
+  markerClusterGroup: L.MarkerClusterGroup | undefined;
+  attractionIds: string[] = [];
 
   // Map zum Speichern des aktuellen Indexes für jedes Event-Set basierend auf dem Schlüssel
   private carouselIndexMap: Map<string, number> = new Map<string, number>();
@@ -81,7 +85,6 @@ export class EventMapPage implements OnInit {
             const [lat, lng] = BerlinBezirkeLatLng[bezirk];
             if (lat === this.selectedLocation.lat && lng === this.selectedLocation.lng) {
               bezirkName = bezirk;
-              console.log(bezirkName);
               break;
             }
           }          
@@ -102,7 +105,6 @@ export class EventMapPage implements OnInit {
         }
       }
       if (bezirkName === '') {
-        console.log('no bezirk');
         this.bezirk = 'Ausgewählter Standort';
       }
   }
@@ -134,7 +136,7 @@ export class EventMapPage implements OnInit {
 
     this.coordinatesList = [];
     this.eventsList = [];
-    this.kulturdatenService.getEventsFilteredByChargeAndDay(this.isFree, this.isToday, this.isTomorrow).subscribe(filteredEvents => {
+    this.kulturdatenService.getEventsFilteredByChargeAndDayAndAttractionIds(this.isFree, this.isToday, this.isTomorrow, this.attractionIds).subscribe(filteredEvents => {
       const locationRequests = filteredEvents.data.events.map((event: any) => {
         return this.kulturdatenService.getLocationById(event.locations[0].referenceId)
           .pipe(
@@ -192,6 +194,7 @@ export class EventMapPage implements OnInit {
 
   private setMarkers(): void {
     this.eventsByLocation = new Map();
+    this.markerClusterGroup?.clearLayers();
 
     this.eventsList.forEach((event: any) => {
       const key = `${event.lat}-${event.lng}`;
@@ -213,10 +216,12 @@ export class EventMapPage implements OnInit {
         weight: 0,
         opacity: 1,
         fillOpacity: 0.8
-      }).addTo(this.map);
+      });
+      this.markerClusterGroup?.addLayer(marker);
 
       let popupContent: string[] = [];
       events.forEach((event: any) => {
+        console.log(event.eventTitle);
         popupContent.push(`
           <h6>${event.eventTitle}</h6>
           <b>Wann?</b> ${this.formatDate(event.eventStartDate) + ', ' + this.formatTime(event.eventStart) + ' Uhr'}</br>
@@ -224,6 +229,7 @@ export class EventMapPage implements OnInit {
           <hr>
         `);
       });
+      
 
       
       const popup = L.popup({
@@ -260,6 +266,7 @@ export class EventMapPage implements OnInit {
       });
       marker.bindPopup(popup);
     });
+    this.map.addLayer(this.markerClusterGroup);
   }
 
   prevEvent(key: string): void {
@@ -336,6 +343,18 @@ export class EventMapPage implements OnInit {
     // Attempt to locate the user
     this.map.locate({setView: true, maxZoom: 13});
 
+    this.markerClusterGroup = L.markerClusterGroup({
+      iconCreateFunction: (cluster) => {
+        const childCount = cluster.getChildCount();  
+        return L.divIcon({
+          html: `<div><span>${childCount}</span></div>`,
+          className: 'map-marker-cluster',
+          iconSize: L.point(35, 35)
+        });
+      },
+      maxClusterRadius: 40
+    });
+    
     // Event when location is found
     this.map.on('locationfound', this.onLocationFound);
 
@@ -356,13 +375,19 @@ export class EventMapPage implements OnInit {
     this.setBezirk();
   }
 
-  onSearchStart(data: any): void {
-    if (data === '') {
+  onSearchStart(term: any): void {
+    if (term === '') {
+      this.attractionIds = [];
       this.applyFilters();
       return;
     } else {
-      // TODO: Implememt search
-      this.applyFilters();
+      this.kulturdatenService.searchAttractions(term).subscribe(response => {
+        console.log(response);
+        this.attractionIds = response?.data.attractions.map((attraction: any) => attraction.identifier);
+        this.applyFilters();
+      }, error => {
+        console.error('Ein Fehler ist aufgetreten:', error);
+      });        
     }
   }
 

@@ -28,12 +28,12 @@
 
 // Light Theme
 :root {
-    --background-color: #ffffff; // Setzen Sie hier Ihre bevorzugte Farbe für das Light Theme
+    --background-color: #ffffff;
   }
   
   @media (prefers-color-scheme: dark) {
     :root {
-        --background-color: #1f1f1f; // Setzen Sie hier Ihre bevorzugte Farbe für das Dark Theme
+        --background-color: #1f1f1f;
     }
   }
 
@@ -42,14 +42,30 @@ ion-button {
     --background-activated: orange;
 }
 
+
+
+.map-marker-cluster {
+  background-color: #473077;
+  opacity: 0.85 !important;
+  text-align: center;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin-left: -20px;
+  margin-top: -20px;
+  text-align: center;
+  border-radius: 50%;
+  line-height: 35px;
+}
+
 .custom-popup .leaflet-popup-content-wrapper {
-  background: #ffbe3e !important; /* Hintergrundfarbe des Popovers */
+  background: #ffbe3e !important;
   color: #473077 !important;
 
 }
 
 .custom-popup .leaflet-popup-tip {
-  background: #ffbe3e !important; /* Hintergrundfarbe des Popovers */
+  background: #ffbe3e !important;
   color: #473077 !important;
 }
 
@@ -76,7 +92,7 @@ ion-button {
 }
 .filter-menu-modal {
     --width: 100%;
-    --height: 55%;
+    --height: 70%;
     --border-radius: 10px;
     display: flex;
     align-items: end;

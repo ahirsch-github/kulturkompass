@@ -1,11 +1,11 @@
 .filter-menu {
     --background: var(--ion-item-background);
-    --overflow: hidden;
+    --overflow: scroll;
 }
 
 .half-height-modal {
-    --height: 50%; /* Setzt die Höhe des Modals auf 50% des Bildschirms */
-    --top: 50%; /* Positioniert das Modal in der Mitte des Bildschirms */
-    --max-height: 50%; /* Stellt sicher, dass das Modal nicht größer als 50% wird */
-    --border-radius: 20px 20px 0 0; /* Abgerundete Ecken oben */
+    --height: 50%;
+    --top: 50%;
+    --max-height: 50%;
+    --border-radius: 20px 20px 0 0;
   }

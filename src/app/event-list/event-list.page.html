@@ -7,10 +7,10 @@
             <ion-icon class="icon-margin-right" name="options"></ion-icon>
             Filter
           </ion-badge>
-          <ng-container *ngIf="selectedDistrictNames.length > 0">
-            <ion-badge *ngFor="let district of selectedDistrictNames" color="secondary">
-              {{ district }}
-              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeDistrict(district)"></ion-icon>
+          <ng-container *ngIf="filters.boroughs.length > 0">
+            <ion-badge *ngFor="let borough of filters.boroughs" color="secondary">
+              {{ borough }}
+              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeBorough(borough)"></ion-icon>
             </ion-badge>
           </ng-container>
           <ng-container *ngIf="selectedCategoryNames.length > 0">
@@ -25,8 +25,8 @@
               <ion-icon class="icon-margin-left" name="close-circle" (click)="removeDate()"></ion-icon>
             </ion-badge>
           </ng-container>
-          <ng-container *ngIf="selectedTimeNames.length > 0">
-            <ion-badge *ngFor="let time of selectedTimeNames" color="secondary">
+          <ng-container *ngIf="filters.times.length > 0">
+            <ion-badge *ngFor="let time of filters.times" color="secondary">
               {{ time }}
               <ion-icon class="icon-margin-left" name="close-circle" (click)="removeTime(time)"></ion-icon>
             </ion-badge>
@@ -47,16 +47,14 @@
       </ion-toolbar>
     </ion-header>
       <ion-list>
-      <!-- Loop durch jedes Event -->
-      <ion-card *ngFor="let event of events?.events">
-        <!-- Titel des Events -->
+      <ng-container *ngFor="let event of events?.events">
+      <ion-card *ngFor="let attraction of event.attractions" (click)="showAttractionDetails(attraction.referenceId, event.locations[0].referenceId)">
         <ion-card-header>
           <ion-card-title class="mouse-pointer">
-            {{ event.attractions[0].referenceLabel.de }}
+            {{ attraction.referenceLabel.de }}
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <!-- Zeitplan -->
           <div>
             <strong>Datum:</strong> {{ formatDate(event.schedule.startDate) }}
             <ng-container *ngIf="event.schedule.startDate !== event.schedule.endDate">
@@ -71,20 +69,20 @@
               {{ formatTime(event.schedule.startTime) }} - {{ formatTime(event.schedule.endTime) }}
             </ng-container>
           </div>
-          
-          <!-- Ort -->
           <div class="mouse-pointer">
-            <strong>Ort:</strong> {{ event.locations[0].referenceLabel.de }}
+            <strong>Ort:</strong>
+            <span *ngFor="let location of event.locations; let isLast=last">
+              {{ location.referenceLabel.de }}{{isLast ? '' : ', '}}
+            </span>
           </div>
-
-          <!-- Eintrittspreis (falls vorhanden) -->
           <div *ngIf="event.admission && event.admission.ticketType === 'ticketType.freeOfCharge'">
               <strong>Eintritt:</strong> Kostenlos
           </div>
         </ion-card-content>
       </ion-card>
+    </ng-container>
     </ion-list>
-    <ion-infinite-scroll *ngIf="allEventsListed === false" (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll *ngIf="allEventsListed === false && isFilteredFlag === false" (ionInfinite)="onIonInfinite($event)">
       <ion-infinite-scroll-content loadingSpinner="bubbles">
       </ion-infinite-scroll-content>
     </ion-infinite-scroll>

@@ -21,21 +21,21 @@
     <ion-item>
       <ion-icon name="time" slot="start"></ion-icon>
       <ion-select [(ngModel)]="selectedTimes" interface="popover" label="Tageszeit" (ionChange)="handleTimeChange($event)" [multiple]="true" [compareWith]="compareWithDt">
-        <ion-select-option *ngFor="let time of times" [value]="time">
+        <ion-select-option *ngFor="let time of times" [value]="time.name">
           {{ time.name }}
         </ion-select-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-icon name="pricetag" slot="start"></ion-icon>
-      <ion-label>Nur kostenlos</ion-label>
+      <ion-label>Kostenlos</ion-label>
       <ion-toggle [(ngModel)]="isFreeOfChargeSelected" (ionChange)="handlePriceChange($event)" aria-label="Nur kostenlos" label ="Nur kostenlos" slot="end"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-icon name="pin" slot="start"></ion-icon>
-      <ion-select [(ngModel)]="selectedDistricts" (ionChange)="handleDistrictChange($event)" label="Bezirk" interface="popover" [multiple]="true" [compareWith]="compareWithFn">
-        <ion-select-option *ngFor="let district of districts" [value]="district">
-          {{ district.name }}
+      <ion-select [(ngModel)]="selectedBoroughs" (ionChange)="handleBoroughChange($event)" label="Bezirk" interface="popover" [multiple]="true" [compareWith]="compareWithDt">
+        <ion-select-option *ngFor="let borough of boroughs" [value]="borough.name">
+          {{ borough.name }}
         </ion-select-option>
       </ion-select>
     </ion-item>
@@ -57,7 +57,7 @@
     </ion-item>
   </ion-list>
   <ion-button expand="block" class="ion-padding" (click)="applyFilters()">Filter anwenden</ion-button>
-  <ion-button style="--background: none;" fill="clear" expand="block" class="ion-padding" (click)="resetFilters()">
+  <ion-button style="--background: none; font-size: 0.8rem;" fill="clear" expand="block" class="" (click)="resetFilters()">
     <ion-icon name="trash-outline" slot="start"></ion-icon>
     Filter zurücksetzen</ion-button>
 </ion-content>
