@@ -1,44 +1,53 @@
 ion-content {
   --background: none transparent;
-  --overflow: hidden; /* Verhindert Scrollen außerhalb der Karte */
-  // height: 100%;
+  --overflow: hidden;
 }
 
-
-/* Styling für den übergeordneten Kartencontainer */
 .map-container {
   position: relative;
-  height: calc(100% - 56px); /* Setzt die Höhe des Containers auf 100% des ion-content */
+  height: calc(100% - 56px);
   width: 100%;
 
   #map {
-    height: 100%; /* Setzt die Höhe der Karte auf 100% des ion-content */
-    position: fixed; /* Absolute Positionierung, um die Karte über den Filtern zu positionieren */
+    height: 100%;
+    position: fixed;
   }
 }
 
-/* Angepasstes Styling für den Filter-Container */
 .filter-container {
-  position: absolute; // Absolute Positionierung
-  top: 65px; // Abstand von oben, passen Sie an, um über der Karte zu schweben
-  left: 50%; // Zentrieren auf der X-Achse
-  transform: translateX(-50%); // Verschiebung um die Hälfte seiner eigenen Breite nach links
+  position: absolute;
+  top: 65px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   justify-content: center;
-  z-index: 1000; // Stellen Sie sicher, dass es über der Karte liegt
+  z-index: 1000;
     
   .filter-button {
-    background-color: #473077; // Weiße Hintergrundfarbe
-    // border: 1px solid #ccc; // Grauer Rand
-    padding: 5px 15px; // Innenabstand
-    margin: 0 5px; // Außenabstand zwischen den Buttons
-    border-radius: 20px; // Abgerundete Ecken
-    font-size: 14px; // Schriftgröße
-    cursor: pointer; // Cursor zum Klicken anzeigen
+    background-color: #473077;
+    padding: 5px 15px;
+    margin: 0 5px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
 
     &.active {
-      background-color: #ffbe3e; // Grüne Hintergrundfarbe für aktive Filter
-      color: #fff; // Weiße Schriftfarbe für aktive Filter
+      background-color: #ffbe3e;
+      color: #fff;
+    }
+
+    &.free-filter {
+      background-color: #47307770;
+      color: #fff;
+      --track-background: #473077;
+      --track-background-checked: #ffbf3e;
+      --handle-background-checked: #fff;
+      margin: 0 5px;
+      --handle-height: calc(26px - (2px * 2));
+      --handle-width: calc(26px - (2px * 2));
+      padding-top: 4px;
+      padding-left: 10px;
+      padding-right: 4px;
     }
   }
 }
@@ -75,14 +84,14 @@ ion-content {
   bottom: 0;
   left: 0;
   width: 100%;
-  z-index: 1000; /* stellt sicher, dass der Container sichtbar bleibt */
+  z-index: 1000;
 }
 
 .half-height-modal {
-  --height: 50%; /* Setzt die Höhe des Modals auf 50% des Bildschirms */
-  --top: 50%; /* Positioniert das Modal in der Mitte des Bildschirms */
-  --max-height: 50%; /* Stellt sicher, dass das Modal nicht größer als 50% wird */
-  --border-radius: 20px 20px 0 0; /* Abgerundete Ecken oben */
+  --height: 50%;
+  --top: 50%;
+  --max-height: 50%;
+  --border-radius: 20px 20px 0 0;
 }
 
 .padding-top {

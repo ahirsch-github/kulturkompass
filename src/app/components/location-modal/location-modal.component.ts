@@ -75,13 +75,18 @@ export class LocationModalComponent implements OnInit {
       this.map.removeLayer(this.currentCircle);
     }
   
-    // TODO: make Marker #473077 and more matching to the design
-    this.currentMarker = L.marker(location).addTo(this.map);
+    var purpleIcon = L.icon({
+      iconUrl: 'assets/icon/marker-pin.svg',
+      iconSize:     [25, 25],
+      iconAnchor:   [12, 12],
+    });
+
+    this.currentMarker = L.marker(location, {icon: purpleIcon}).addTo(this.map);
   
     this.currentCircle = L.circle(location, {
       color: '#473077',
       fillColor: '#8974b4',
-      fillOpacity: 0.3,
+      fillOpacity: 0.2,
       radius: (this.selectedRadius || 0) * 1000,
       interactive: false
     }).addTo(this.map);

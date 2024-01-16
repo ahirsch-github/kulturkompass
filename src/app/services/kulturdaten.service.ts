@@ -37,7 +37,7 @@ export class KulturdatenService {
         }
       }
     };
-    return this.http.post(`${this.baseUrl}/events/search?page=${page}`, body, { headers: this.headers })
+    return this.http.post(`${this.baseUrl}/events/search?pageSize=2000`, body, { headers: this.headers })
       .pipe(
         catchError(this.handleError)
       );
@@ -147,7 +147,7 @@ export class KulturdatenService {
       );
   }
 
-  getEventsFilteredByChargeAndDay(isFree: boolean, isToday: boolean, isTomorrow: boolean): Observable<any> {
+  getEventsFilteredByChargeAndDayAndAttractionIds(isFree: boolean, isToday: boolean, isTomorrow: boolean, attractionIds: string[]): Observable<any> {
     const date = new Date();
     const today = date.toISOString().split('T')[0];
     date.setDate(date.getDate() + 1);
@@ -163,16 +163,103 @@ export class KulturdatenService {
     } else if (isTomorrow) {
       filter['schedule.startDate'] = tomorrow;
     }
-  
+
+    if (attractionIds?.length > 0) {
+      filter['attractions.referenceId'] = { "$in": attractionIds };
+    }
+    
     const body = {
       searchFilter: filter
     };
+
     return this.http.post(`${this.baseUrl}/events/search?pageSize=300`, body, { headers: this.headers })
       .pipe(
         catchError(this.handleError)
       );
   }
   
+  searchAttractionsByFilters(filters: any): Observable<any> {
+    const body = {
+      searchFilter: filters
+    };
+    return this.http.post(`${this.baseUrl}/attractions/search?pageSize=5000`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  searchEventsbyFilters(dates: string[], times: string[], isFree: boolean, locations: string[], attractions: string[]): Observable<any> {
+    let filters = [];
+    
+    if (dates.length > 0) {
+      const dateFilters = dates.map(date => ({ 'schedule.startDate': date }));
+      filters.push({ '$or': dateFilters });
+    }
+    
+    if (times.length > 0) {
+      const timeFilters = times.map(time => {
+          const [startTime, endTime] = time.split(' - ');
+          return { 'schedule.startTime': { $gte: startTime, $lt: endTime } };
+      });
+      filters.push({ '$or': timeFilters });
+    }
+    
+    if (locations.length > 0) {
+      filters.push({ 'locations.referenceId': { "$in": locations } });
+    }
+
+    if (attractions.length > 0) {
+      filters.push({ 'attractions.referenceId': { "$in": attractions } });
+    }
+    
+    if (isFree) {
+      filters.push({ 'admission.ticketType': 'ticketType.freeOfCharge' });
+    }
+    
+    const filter = filters.length > 1 ? { '$and': filters } : filters[0] || {};
+    const body = { searchFilter: filter };
+
+    console.log(body);
+    
+    return this.http.post(`${this.baseUrl}/events/search?pageSize=300`, body, { headers: this.headers })
+      .pipe(catchError(this.handleError));
+  }
+    
+  
+  searchLocationsByBoroughAndTag(borough: string[], accessibilityIds: string[]): Observable<any> {
+    const filter: any = {};
+
+    if (borough.length > 0 && accessibilityIds.length > 0) {
+      filter['$and'] = [{ 'borough': { "$in": borough } }, { 'accessibility': { "$all": accessibilityIds } }];
+    } else if (borough.length > 0) {
+      filter['borough'] = { "$in": borough };
+    } else if (accessibilityIds.length > 0) {
+      filter['accessibility'] = { "$all": accessibilityIds };
+    }
+
+    const body = {
+      searchFilter: filter
+    };
+
+    return this.http.post(`${this.baseUrl}/locations/search?pageSize=500`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  searchAttractionByCategory(categories: string[]): Observable<any> {
+    const body = {
+      searchFilter: {
+        tags: {
+          "$in": categories
+        }
+      }
+    };
+    return this.http.post(`${this.baseUrl}/attractions/search?pageSize=5000`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 
   private handleError(error: any): String {
     console.error('Ein Fehler ist aufgetreten:', error);

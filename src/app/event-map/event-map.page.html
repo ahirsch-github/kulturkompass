@@ -9,16 +9,13 @@
     </div>
     <div class="filter-container">
       <!-- Kostenlos-Filter -->
-      <button class="filter-button" [class.active]="isFree" (click)="onFreeFilterToggle()">
+      <!-- <button class="filter-button" [class.active]="isFree" (click)="onFreeFilterToggle()">
         kostenlos
-      </button>
-      
-      <!-- Heute-Filter -->
+      </button> -->
+      <ion-toggle class="filter-button free-filter" [(ngModel)]="isFree" (ionChange)="onFreeFilterToggle()" aria-label="kostenlos" label ="kostenlos" slot="end">kostenlos</ion-toggle>
       <button class="filter-button" [class.active]="isToday" (click)="onTodayFilterToggle()">
         heute
       </button>
-      
-      <!-- Morgen-Filter -->
       <button class="filter-button" [class.active]="isTomorrow" (click)="onTomorrowFilterToggle()">
         morgen
       </button>

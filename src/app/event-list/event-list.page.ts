@@ -22,19 +22,17 @@ export class EventListPage implements OnInit {
   }
 
   filters = {
-    dates: [],
-    times: [],
-    categories: [],
-    accessibilities: [],
-    districts: [{}],
+    dates: [] as string[],
+    times: [] as string[],
+    categories: [] as string[],
+    accessibilities: [] as string[],
+    boroughs: [] as string[],
     isFreeOfChargeSelected: false,
     selectedLocation: null,
     selectedRadius: 0,
   };
-  selectedDistrictNames: string[] = [];
   selectedCategoryNames: string[] = [];
   selectedAccessibilityNames: string[] = [];
-  selectedTimeNames: string[] = [];
 
   async openFilterMenuModal() {
     const modal = await this.modalControlle.create({
@@ -51,15 +49,10 @@ export class EventListPage implements OnInit {
         this.filters.times = dataReturned.data.selectedTimes;
         this.filters.categories = dataReturned.data.selectedCategories;
         this.filters.accessibilities = dataReturned.data.selectedAccessibilities;
-        this.filters.districts = dataReturned.data.selectedDistricts;
+        this.filters.boroughs = dataReturned.data.selectedBoroughs;
         this.filters.isFreeOfChargeSelected = dataReturned.data.isFreeOfChargeSelected;
         this.filters.selectedLocation = dataReturned.data.selectedLocation;
         this.filters.selectedRadius = dataReturned.data.selectedRadius;
-
-        this.selectedDistrictNames = [];
-        this.filters.districts.forEach((district: any) => {
-          if(district.name) this.selectedDistrictNames.push(district.name);
-        });
 
         this.selectedCategoryNames = [];
         this.filters.categories.forEach((category: any) => {
@@ -71,26 +64,23 @@ export class EventListPage implements OnInit {
           this.selectedAccessibilityNames.push(accessibility.name);
         });
 
-        this.selectedTimeNames = [];
-        this.filters.times.forEach((time: any) => {
-          this.selectedTimeNames.push(time.name);
-        });
+        this.searchEventsbyFilters();
       }
     });
   }
 
-  removeDistrict(district: any): void {
-    this.filters.districts = this.filters.districts.filter((d: any) => {
-      return d.name !== district;
+  removeBorough(district: any): void {
+    this.filters.boroughs = this.filters.boroughs.filter((d: any) => {
+      return d !== district;
     });
-    this.selectedDistrictNames = this.selectedDistrictNames.filter((name: string) => name !== district);
+    this.searchEventsbyFilters();
   }
   
   removeTime(time: any): void {
     this.filters.times = this.filters.times.filter((t: any) => {
-      return t.name !== time;
+      return t !== time;
     });
-    this.selectedTimeNames = this.selectedTimeNames.filter((name: string) => name !== time);
+    this.searchEventsbyFilters();
   }
 
   removeCategory(category: any): void {
@@ -98,19 +88,23 @@ export class EventListPage implements OnInit {
       return c.name !== category;
     });
     this.selectedCategoryNames = this.selectedCategoryNames.filter((name: string) => name !== category);
+    this.searchEventsbyFilters();
   }
 
   removeDate(): void {
-      this.filters.dates = [];
+    this.filters.dates = [];
+    this.searchEventsbyFilters();
   }
 
   removeAccessibility(): void {
-      this.filters.accessibilities = [];
-      this.selectedAccessibilityNames = [];
+    this.filters.accessibilities = [];
+    this.selectedAccessibilityNames = [];
+    this.searchEventsbyFilters();
   }
 
   removeFreeOfCharge(): void {
     this.filters.isFreeOfChargeSelected = false;
+    this.searchEventsbyFilters();
   }
 
   private loadEvents(): void {
@@ -143,13 +137,64 @@ export class EventListPage implements OnInit {
       return;
     }
     if(this.isFilteredFlag) {
-      this.loadFilteredEvents();
+      return;
     } else {
       this.loadEvents();
     }
     setTimeout(() => {
       (ev as InfiniteScrollCustomEvent).target.complete();
     }, 500);
+  }
+
+  searchAttractionsbyFilters(): void {
+    this.kulturdatenService.searchAttractionsByFilters(this.filters).subscribe(response => {
+      this.events = response;
+      this.idsToFilter = this.extractAttractionIds();
+      this.loadFilteredEvents();
+    }
+    , error => {
+      console.error('Ein Fehler ist aufgetreten:', error);
+    });
+  }
+
+  searchEventsbyFilters(): void {
+    const locationIds: string[] = [];
+    const accessibilityIds = this.filters.accessibilities.map((accessibility: any) => accessibility.id);
+    this.kulturdatenService.searchLocationsByBoroughAndTag(this.filters.boroughs, accessibilityIds).subscribe(response => {
+      locationIds.push(...response.data.locations.map((location: any) => location.identifier));
+  
+      const timeFilters: string[] = [];
+      this.filters.times.length > 0 ? this.filters.times.forEach((time: any) => {
+        if (time == 'Morgens') {
+          timeFilters.push('04:00 - 12:00');
+        } else if (time == 'Tagsüber') {
+          timeFilters.push('12:00 - 18:00');
+        } else if (time == 'Abends') {
+          timeFilters.push('18:00 - 24:00');
+        }
+      } ) : [];
+
+      const attractionIds: string[] = [];
+      const attractionTags = this.filters.categories.map((category: any) => category.id);
+      console.log(attractionTags);
+      this.kulturdatenService.searchAttractionByCategory(attractionTags).subscribe(response => {
+        console.log(response.data.attractions);
+        attractionIds.push(...response.data.attractions.map((attraction: any) => attraction.identifier));
+
+        this.kulturdatenService.searchEventsbyFilters(this.filters.dates, timeFilters, this.filters.isFreeOfChargeSelected, locationIds, attractionIds).subscribe(response => {
+          this.events = response;
+          this.events = response.data;
+          this.isFilteredFlag = true;      
+        });
+      });
+    }, error => {
+      console.error('Ein Fehler ist aufgetreten:', error);
+    });
+  }
+
+  showAttractionDetails(attractionId: any, locationId: any): void {
+    console.log(attractionId);
+    console.log(locationId);
   }
 
   searchAttractionsbyTerm(term: any): void {
@@ -183,17 +228,7 @@ export class EventListPage implements OnInit {
 
   loadFilteredEvents(): void {
     this.kulturdatenService.getEventsByAttractionIds(this.idsToFilter, this.eventPage).subscribe(response => {
-      if (this.eventPage === 1) {
-        this.events = response.data;
-      } else {
-        this.events.events = [...this.events.events, ...response.data.events];
-      }
-      this.isFilteredFlag = true;
-      if(Math.ceil(response.data.totalCount / 30) == this.eventPage) {
-        this.allEventsListed = true;
-        console.log('All events listed');
-      }
-      this.eventPage++;
+      this.events = response.data;
     }, error => {
       console.error('Ein Fehler ist aufgetreten:', error);
     });
@@ -206,5 +241,4 @@ export class EventListPage implements OnInit {
   formatTime(time: string): string {
     return time.substr(0, 5) || '';
   }
-
 }

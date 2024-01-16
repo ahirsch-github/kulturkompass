@@ -45,7 +45,7 @@ export class FilterMenuComponent  implements OnInit {
     { id: LocationTags.wheelchairDifficult, name: 'Für RollstuhlfahrerInnen erschwert zugänglich' },
   ]
 
-  districts = [ 
+  boroughs = [ 
     { name: 'Mitte', },
     { name: 'Friedrichshain-Kreuzberg', },
     { name: 'Pankow', },
@@ -69,7 +69,7 @@ export class FilterMenuComponent  implements OnInit {
   isFreeOfChargeSelected = false;
   selectedAccessibilities: any[] = [];
   selectedCategories: any[] = [];
-  selectedDistricts: any[] = [];
+  selectedBoroughs: any[] = [];
   selectedDates: any[] = [];
   selectedTimes: any[] = [];
   selectedLocation: any;
@@ -83,7 +83,7 @@ export class FilterMenuComponent  implements OnInit {
   ngOnInit() {
     this.selectedAccessibilities = this.filters.accessibilities || [];
     this.selectedCategories = this.filters.categories || [];
-    this.selectedDistricts = this.filters.districts || [];
+    this.selectedBoroughs = this.filters.boroughs || [];
     this.selectedDates = this.filters.dates || [];
     this.selectedTimes = this.filters.times || [];
     this.isFreeOfChargeSelected = this.filters.isFreeOfChargeSelected || false;
@@ -97,8 +97,8 @@ export class FilterMenuComponent  implements OnInit {
     this.selectedCategories = event.detail.value;
   }
 
-  handleDistrictChange(event: any) {
-    this.selectedDistricts = event.detail.value;
+  handleBoroughChange(event: any) {
+    this.selectedBoroughs = event.detail.value;
   }
 
   handlePriceChange(event: any) {
@@ -118,7 +118,7 @@ export class FilterMenuComponent  implements OnInit {
       'selectedDates': this.selectedDates,
       'selectedTimes': this.selectedTimes,
       'selectedCategories': this.selectedCategories,
-      'selectedDistricts': this.selectedDistricts,
+      'selectedBoroughs': this.selectedBoroughs,
       'selectedAccessibilities': this.selectedAccessibilities,
       'isFreeOfChargeSelected': this.isFreeOfChargeSelected,
       'selectedLocation': this.selectedLocation,
@@ -133,7 +133,7 @@ export class FilterMenuComponent  implements OnInit {
   resetFilters() {
     this.selectedAccessibilities = [];
     this.selectedCategories = [];
-    this.selectedDistricts = [];
+    this.selectedBoroughs = [];
     this.selectedDates = [];
     this.selectedTimes = [];
     this.isFreeOfChargeSelected = false;
