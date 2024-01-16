@@ -24,3 +24,62 @@
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+
+
+// Light Theme
+:root {
+    --background-color: #ffffff; // Setzen Sie hier Ihre bevorzugte Farbe für das Light Theme
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1f1f1f; // Setzen Sie hier Ihre bevorzugte Farbe für das Dark Theme
+    }
+  }
+
+ion-button {
+    --background: #473077;
+    --background-activated: orange;
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+  background: #ffbe3e !important; /* Hintergrundfarbe des Popovers */
+  color: #473077 !important;
+
+}
+
+.custom-popup .leaflet-popup-tip {
+  background: #ffbe3e !important; /* Hintergrundfarbe des Popovers */
+  color: #473077 !important;
+}
+
+
+.carousel-controls {
+  display: flex;
+  justify-content: center;
+
+
+  .prev {
+    padding-right: 10px;
+    cursor: pointer;
+  }
+  
+  .next {
+    padding-left: 10px;
+    cursor: pointer;
+  }
+
+  .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+.filter-menu-modal {
+    --width: 100%;
+    --height: 55%;
+    --border-radius: 10px;
+    display: flex;
+    align-items: end;
+  }
+  
+  

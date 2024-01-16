@@ -5,18 +5,17 @@ import { EventListPageRoutingModule } from './event-list-routing.module';
 
 import { EventListPage } from './event-list.page';
 import { SharedModuleModule } from '../shared-module/shared-module.module';
-import { IonicModule } from '@ionic/angular';
-import { BrowserModule } from '@angular/platform-browser';
-import { TabsPageModule } from '../tabs/tabs.module';
-import { TabsPage } from '../tabs/tabs.page';
+import { FilterMenuComponent } from '../components/filter-menu/filter-menu.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
     EventListPageRoutingModule,
     SharedModuleModule,
     CommonModule,
+    FormsModule
   ],
-  declarations: [EventListPage],
+  declarations: [EventListPage, FilterMenuComponent],
   providers: [DatePipe]
 })
 export class EventListPageModule {}
