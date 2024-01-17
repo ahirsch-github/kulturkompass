@@ -332,13 +332,33 @@ export class EventMapPage implements OnInit {
       zoomControl: false,
     });
 
-    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      minZoom: 11,
-      attribution: '© OpenStreetMap contributors'
-    });
+    // select selected mode from user (dark or light)
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
+    let tiles;
+
+    if (prefersDark) {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap, © Stadia Maps'
+      });
+    } else {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap contributors, © Stadia Maps'
+      });
+    }
     tiles.addTo(this.map);
+
+
+    // // Create overlay tile layer
+    // const overlayTiles = L.tileLayer('https://tile.tracestrack.com/bicycle-route/{z}/{x}/{y}.png ', {
+    //   maxZoom: 19,
+    //   minZoom: 11,
+    // });
+    // overlayTiles.addTo(this.map);
 
     // Attempt to locate the user
     this.map.locate({setView: true, maxZoom: 13});

@@ -56,11 +56,15 @@
       </ion-select>
     </ion-item>
   </ion-list>
-  <ion-button expand="block" class="ion-padding" (click)="applyFilters()">Filter anwenden</ion-button>
-  <ion-button style="--background: none; font-size: 0.8rem;" fill="clear" expand="block" class="" (click)="resetFilters()">
-    <ion-icon name="trash-outline" slot="start"></ion-icon>
-    Filter zurücksetzen</ion-button>
 </ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-button expand="block" class="ion-padding" (click)="applyFilters()">Filter anwenden</ion-button>
+    <ion-button style="--background: none; font-size: 0.8rem;" fill="clear" expand="block" class="" (click)="resetFilters()">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Filter zurücksetzen</ion-button>
+  </ion-toolbar>
+</ion-footer>
 <ion-modal [keepContentsMounted]="true">
   <ng-template>
     <ion-datetime [(ngModel)]="selectedDates" id="datetime" (ionChange)="handleDateChange($event)" [multiple]="true" presentation="date" [value]="selectedDates">
