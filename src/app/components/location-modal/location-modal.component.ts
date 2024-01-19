@@ -1,7 +1,8 @@
-import { ModalController } from '@ionic/angular';
+import { ModalController, isPlatform } from '@ionic/angular';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { BerlinBezirkeLatLng } from 'src/app/enums/berlin-bezirke-latlng';
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-location-modal',
@@ -15,6 +16,7 @@ export class LocationModalComponent implements OnInit {
   @Input() selectedLocation: L.LatLngExpression | undefined;
   @Input() selectedRadius: number | undefined;
   @Input() showDistrictFilter!: boolean | true;
+  defaultLocation: L.LatLngExpression = [52.5200, 13.4050];
 
   constructor(private modalCtrl: ModalController) {}
   
@@ -51,7 +53,7 @@ export class LocationModalComponent implements OnInit {
 
   initMap(): void {
     if (!this.selectedLocation) {
-      this.selectedLocation = [52.5200, 13.4050]; // Berlin Mitte
+      this.selectedLocation = this.defaultLocation; // Berlin Mitte
     }
   
     this.map = L.map('modal-map').setView(this.selectedLocation, 13);
@@ -68,6 +70,8 @@ export class LocationModalComponent implements OnInit {
   }
   
   setMarkerAndRadius(location: any, radius: any): void {
+    console.log(location);
+    console.log(radius);
     if (this.currentMarker) {
       this.map.removeLayer(this.currentMarker);
     }
@@ -169,12 +173,35 @@ export class LocationModalComponent implements OnInit {
 
   useCurrentLocation(): void {
     console.log('use current location');
-    this.map.locate();
-    this.map.on('locationfound', this.onLocationFound);
-    this.map.on('locationerror', this.onLocationError);
+    this.getLocation();
   }
 
+  async getLocation() {
+    let position: any;
+
+    if (isPlatform('hybrid')) {
+      console.log('hybrid');
+      
+      // Use Capacitor's Geolocation API for iOS and Android
+      position = await Geolocation.getCurrentPosition();
+      // set coordinates if position is found, otherwise use default location
+      if (position) {
+        this.selectedLocation = [position.coords.latitude, position.coords.longitude];
+      } else {
+        this.selectedLocation = this.defaultLocation;
+      }
+      this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
+
+    } else {
+      console.log('web');
+      this.map.locate();
+      this.map.on('locationfound', this.onLocationFound);
+      this.map.on('locationerror', this.onLocationError);
+    }
+  }
+  
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
+    console.log(e);
     this.selectedLocation = e.latlng;
     this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
   }

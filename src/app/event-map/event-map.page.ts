@@ -9,6 +9,8 @@ import { BerlinBezirke } from '../enums/berlin-bezirke';
 import { DatePipe } from '@angular/common';
 import 'leaflet.markercluster';
 import { MarkerClusterGroup } from 'leaflet';
+import { Geolocation } from '@capacitor/geolocation';
+import { isPlatform } from '@ionic/angular';  
 
 @Component({
   selector: 'app-event-map',
@@ -32,6 +34,8 @@ export class EventMapPage implements OnInit {
   isTomorrow: boolean = false;
   markerClusterGroup: L.MarkerClusterGroup | undefined;
   attractionIds: string[] = [];
+
+  eventsByLocation: Map<string, any[]> = new Map<string, any[]>();
 
   // Map zum Speichern des aktuellen Indexes für jedes Event-Set basierend auf dem Schlüssel
   private carouselIndexMap: Map<string, number> = new Map<string, number>();
@@ -95,7 +99,8 @@ export class EventMapPage implements OnInit {
   }
 
   setBezirk() {
-    let bezirkName = '';
+    if(this.map) {
+      let bezirkName = '';
       for (const bezirk in BerlinBezirkeLatLng) {
         const [lat, lng] = BerlinBezirkeLatLng[bezirk];
         if (lat === this.selectedLocation[0] && lng === this.selectedLocation[1]) {
@@ -107,6 +112,7 @@ export class EventMapPage implements OnInit {
       if (bezirkName === '') {
         this.bezirk = 'Ausgewählter Standort';
       }
+    }
   }
 
   onFreeFilterToggle(): void {
@@ -127,44 +133,46 @@ export class EventMapPage implements OnInit {
   }
 
   private applyFilters(): void {
-    this.map.eachLayer((layer: any) => {
-      if (layer instanceof L.CircleMarker) {
-        this.map.removeLayer(layer);
-      }
-    });
-    this.setLocationAndRadius();
-
-    this.coordinatesList = [];
-    this.eventsList = [];
-    this.kulturdatenService.getEventsFilteredByChargeAndDayAndAttractionIds(this.isFree, this.isToday, this.isTomorrow, this.attractionIds).subscribe(filteredEvents => {
-      const locationRequests = filteredEvents.data.events.map((event: any) => {
-        return this.kulturdatenService.getLocationById(event.locations[0].referenceId)
-          .pipe(
-            switchMap((response) => {
-              let location = response.data.location;
-              return this.kulturdatenService.getCoordinates(location.address.streetAddress, location.address.addressLocality, location.address.postalCode)
-                .pipe(
-                  map(coordinates => ({
-                    eventTitle: event.attractions[0].referenceLabel.de,
-                    eventStartDate: event.schedule.startDate,
-                    eventStart: event.schedule.startTime,
-                    eventLocationTitle: location.title.de,
-                    lat: coordinates.lat,
-                    lng: coordinates.lng
-                  }))
-                );
-            })
-          );
+    if (this.map) {
+      this.map.eachLayer((layer: any) => {
+        if (layer instanceof L.CircleMarker) {
+          this.map.removeLayer(layer);
+        }
       });
+      this.setLocationAndRadius();
 
-      forkJoin(locationRequests).subscribe((results: any) => {
-        const eventsList: any[] = results as any[];
-        this.eventsList = eventsList.filter(eventInfo => {
-          return (eventInfo.lat !== 0 || eventInfo.lng !== 0) && this.isWithinRadius(eventInfo);
+      this.coordinatesList = [];
+      this.eventsList = [];
+      this.kulturdatenService.getEventsFilteredByChargeAndDayAndAttractionIds(this.isFree, this.isToday, this.isTomorrow, this.attractionIds).subscribe(filteredEvents => {
+        const locationRequests = filteredEvents.data.events.map((event: any) => {
+          return this.kulturdatenService.getLocationById(event.locations[0].referenceId)
+            .pipe(
+              switchMap((response) => {
+                let location = response.data.location;
+                return this.kulturdatenService.getCoordinates(location.address.streetAddress, location.address.addressLocality, location.address.postalCode)
+                  .pipe(
+                    map(coordinates => ({
+                      eventTitle: event.attractions[0].referenceLabel.de,
+                      eventStartDate: event.schedule.startDate,
+                      eventStart: event.schedule.startTime,
+                      eventLocationTitle: location.title.de,
+                      lat: coordinates.lat,
+                      lng: coordinates.lng
+                    }))
+                  );
+              })
+            );
         });
-        this.setMarkers();
+
+        forkJoin(locationRequests).subscribe((results: any) => {
+          const eventsList: any[] = results as any[];
+          this.eventsList = eventsList.filter(eventInfo => {
+            return (eventInfo.lat !== 0 || eventInfo.lng !== 0) && this.isWithinRadius(eventInfo);
+          });
+          this.setMarkers();
+        });
       });
-    });
+    }
   }
 
   setLocationAndRadius(): void {
@@ -189,8 +197,6 @@ export class EventMapPage implements OnInit {
     const distance = center.distanceTo(eventLocation); // Distanz in Metern
     return distance <= this.selectedRadius * 1000; // Umwandlung von km in Meter
   }
-
-  eventsByLocation: Map<string, any[]> = new Map<string, any[]>();
 
   private setMarkers(): void {
     this.eventsByLocation = new Map();
@@ -352,17 +358,6 @@ export class EventMapPage implements OnInit {
     }
     tiles.addTo(this.map);
 
-
-    // // Create overlay tile layer
-    // const overlayTiles = L.tileLayer('https://tile.tracestrack.com/bicycle-route/{z}/{x}/{y}.png ', {
-    //   maxZoom: 19,
-    //   minZoom: 11,
-    // });
-    // overlayTiles.addTo(this.map);
-
-    // Attempt to locate the user
-    this.map.locate({setView: true, maxZoom: 13});
-
     this.markerClusterGroup = L.markerClusterGroup({
       iconCreateFunction: (cluster) => {
         const childCount = cluster.getChildCount();  
@@ -374,12 +369,40 @@ export class EventMapPage implements OnInit {
       },
       maxClusterRadius: 40
     });
-    
-    // Event when location is found
-    this.map.on('locationfound', this.onLocationFound);
 
-    // Event for location error
-    this.map.on('locationerror', this.onLocationError);
+    this.map.locate({setView: true, maxZoom: 13});
+    this.getLocation();
+  }
+
+  async getLocation() {
+    let position: any;
+
+    if (isPlatform('hybrid')) {
+      console.log('hybrid');
+      
+      // Use Capacitor's Geolocation API for iOS and Android
+      position = await Geolocation.getCurrentPosition({timeout: 20000});
+      // set coordinates if position is found, otherwise use default location
+      if (position) {
+        this.selectedLocation = [position.coords.latitude, position.coords.longitude];
+
+        // if selected location is empty, use default location
+        if (this.selectedLocation.length === 0) {
+          this.selectedLocation = this.defaultLocation;
+        }
+        this.applyFilters();
+        this.setBezirk();
+      } else {
+        this.selectedLocation = this.defaultLocation;
+        this.applyFilters();
+        this.setBezirk();
+      }
+
+    } else {
+      console.log('web');
+      this.map.on('locationfound', this.onLocationFound);
+      this.map.on('locationerror', this.onLocationError);
+    }
   }
 
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
@@ -387,7 +410,7 @@ export class EventMapPage implements OnInit {
     this.applyFilters();
     this.setBezirk();
   }
-  
+
   private onLocationError = (e: any) => {
     console.error(e.message);
     this.selectedLocation = this.defaultLocation;
@@ -402,7 +425,6 @@ export class EventMapPage implements OnInit {
       return;
     } else {
       this.kulturdatenService.searchAttractions(term).subscribe(response => {
-        console.log(response);
         this.attractionIds = response?.data.attractions.map((attraction: any) => attraction.identifier);
         this.applyFilters();
       }, error => {
