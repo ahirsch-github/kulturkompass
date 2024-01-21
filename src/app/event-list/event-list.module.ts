@@ -7,6 +7,7 @@ import { EventListPage } from './event-list.page';
 import { SharedModuleModule } from '../shared-module/shared-module.module';
 import { FilterMenuComponent } from '../components/filter-menu/filter-menu.component';
 import { FormsModule } from '@angular/forms';
+import { EventDetailComponent } from '../components/event-detail/event-detail.component';
 
 @NgModule({
   imports: [
@@ -15,7 +16,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     FormsModule
   ],
-  declarations: [EventListPage, FilterMenuComponent],
+  declarations: [EventListPage, FilterMenuComponent, EventDetailComponent],
   providers: [DatePipe]
 })
 export class EventListPageModule {}

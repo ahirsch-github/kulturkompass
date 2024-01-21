@@ -3,6 +3,7 @@ import { KulturdatenService } from '../services/kulturdaten.service';
 import { InfiniteScrollCustomEvent, IonMenu, MenuController, ModalController } from '@ionic/angular';
 import { DatePipe } from '@angular/common';
 import { FilterMenuComponent } from '../components/filter-menu/filter-menu.component';
+import { EventDetailComponent } from '../components/event-detail/event-detail.component';
 
 @Component({
   selector: 'app-event-list',
@@ -192,9 +193,40 @@ export class EventListPage implements OnInit {
     });
   }
 
-  showAttractionDetails(attractionId: any, locationId: any): void {
+  async showAttractionDetails(attractionId: any, locationId: any, eventStartDate: any, eventEndDate: any, eventStartTime: any, eventEndTime: any, eventIsFreeOfCharge: any) {
     console.log(attractionId);
-    console.log(locationId);
+    this.kulturdatenService.getAttractionById(attractionId).subscribe(response => {
+
+      let attraction = response.data.attraction;
+
+      this.kulturdatenService.getLocationById(locationId).subscribe(async response => {
+        const modal = await this.modalControlle.create({
+          component: EventDetailComponent,
+          cssClass: 'event-details-modal',
+          componentProps: {
+            attraction: attraction,
+            location: response.data.location,
+            event: {
+              startDate: eventStartDate,
+              endDate: eventEndDate,
+              startTime: eventStartTime,
+              endTime: eventEndTime,
+              isAccessibleForFree: eventIsFreeOfCharge
+            }
+          }
+        });
+        await modal.present();
+        modal.onDidDismiss().then((dataReturned) => {
+          if (dataReturned.data) {
+            console.log(dataReturned.data);
+          }
+        });
+      }, error => {
+        console.error('Ein Fehler ist aufgetreten:', error);
+      });
+    }, error => {
+      console.error('Ein Fehler ist aufgetreten:', error);
+    });
   }
 
   searchAttractionsbyTerm(term: any): void {
