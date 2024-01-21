@@ -10,68 +10,170 @@
       <ion-label class="intro-text">
         <p>Um die Benutzererfahrung zu verbessern, bitten wir Sie, einige Fragen zu beantworten.</p>
       </ion-label>
-        <ion-label class="question-text">Welcher Veranstaltungen interessieren Sie?</ion-label>
-        <ion-segment formControlName="eventType">
-          <ion-segment-button value="music">
-            <ion-label>Musik</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="theater">
-            <ion-label>Theater</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="sports">
-            <ion-label>Sport</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="workshops">
-            <ion-label>Workshops</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="exhibitions">
-            <ion-label>Kunst</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <ion-label class="question-text">Wie oft besuchen Sie Events?</ion-label>
-        <ion-segment formControlName="frequency">
-          <ion-segment-button value="weekly">
-            <ion-label>Wöchentlich</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="monthly">
-            <ion-label>Monatlich</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="rarely">
-            <ion-label>Selten</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <ion-label class="question-text">Was ist Ihnen bei einem Event wichtig?</ion-label>
-        <ion-segment formControlName="priority">
-          <ion-segment-button value="free">
-            <ion-label>Kosten</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="exclusive">
-            <ion-label>Exklusivität</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="location">
-            <ion-label>Standort</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="type">
-            <ion-label>Art des Events</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <ion-label class="question-text">Wie mobil sind Sie für Events?</ion-label>
-        <ion-segment formControlName="mobility">
-          <ion-segment-button value="local">
-            <ion-label>Lokal</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="citywide">
-            <ion-label>Stadtweit</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="surrounding">
-            <ion-label>Umland</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="online">
-            <ion-label>Online</ion-label>
-          </ion-segment-button>
-        </ion-segment>
+
+      <ion-label class="question-text">Veranstaltungsthemen:</ion-label>
+      <ion-checkbox-group formControlName="eventTopics">
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Musik</ion-label>
+              <ion-checkbox value="music" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Theater</ion-label>
+              <ion-checkbox value="theater" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Sport</ion-label>
+              <ion-checkbox value="sports" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Kunst</ion-label>
+              <ion-checkbox value="art" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-checkbox-group>
+
+      <ion-label class="question-text">Veranstaltungstyp:</ion-label>
+      <ion-checkbox-group formControlName="eventTypes">
+        <ion-row>
+          <ion-col size="4">
+            <ion-item>
+              <ion-label>Teilnehmen</ion-label>
+              <ion-checkbox value="participate" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="4">
+            <ion-item>
+              <ion-label>Konsumieren</ion-label>
+              <ion-checkbox value="consume" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="4">
+            <ion-item>
+              <ion-label>Organisieren</ion-label>
+              <ion-checkbox value="organize" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-checkbox-group>
+
+      <ion-label class="question-text">Kosten:</ion-label>
+      <ion-checkbox-group formControlName="costs">
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Kostenlos</ion-label>
+              <ion-checkbox value="free" (ionChange)="onCheckboxChange($event, 'costs')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Für Geld</ion-label>
+              <ion-checkbox value="paid" (ionChange)="onCheckboxChange($event, 'costs')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-checkbox-group>
+
+      <ion-label class="question-text">Bezirke:</ion-label>
+      <ion-checkbox-group formControlName="districts">
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Charlottenburg-Wilmersdorf</ion-label>
+              <ion-checkbox value="charlottenburg-wilmersdorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Friedrichshain-Kreuzberg</ion-label>
+              <ion-checkbox value="friedrichshain-kreuzberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Lichtenberg</ion-label>
+              <ion-checkbox value="lichtenberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Marzahn-Hellersdorf</ion-label>
+              <ion-checkbox value="marzahn-hellersdorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Mitte</ion-label>
+              <ion-checkbox value="mitte" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Neukölln</ion-label>
+              <ion-checkbox value="neukolln" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Pankow</ion-label>
+              <ion-checkbox value="pankow" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Reinickendorf</ion-label>
+              <ion-checkbox value="reinickendorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Spandau</ion-label>
+              <ion-checkbox value="spandau" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Steglitz-Zehlendorf</ion-label>
+              <ion-checkbox value="steglitz-zehlendorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Tempelhof-Schöneberg</ion-label>
+              <ion-checkbox value="tempelhof-schoneberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-label>Treptow-Köpenick</ion-label>
+              <ion-checkbox value="treptow-kopenick" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-checkbox-group>
     </ion-list>
-    
+
     <div class="ion-padding">
       <ion-button type="submit" expand="block" color="secondary">Einstellungen speichern</ion-button>
     </div>

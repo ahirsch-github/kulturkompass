@@ -29,6 +29,13 @@ export class KulturdatenService {
       );
   }
 
+  getFutureEvents(pageSize: number = 278, body: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/events/search?pageSize=${pageSize}`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   getEventsByAttractionIds(attractionIds: string[], page: number): Observable<any> {
     const body = {
       searchFilter: {
