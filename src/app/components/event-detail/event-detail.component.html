@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="arrow-back"></ion-icon>
+        <ion-label style="padding-left: 10px;">Zurück</ion-label>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-title>{{ attraction.title.de }}</ion-title>
+      <ion-list [inset]="true">
+        <ion-item>
+          {{ location.address.streetAddress }} {{ location.address.postalCode }}, {{ location.address.addressLocality }}, {{ location.borough }}
+        </ion-item>
+        <ion-item>
+          {{ formatDate(event.startDate) }}
+          <ng-container *ngIf="event.startDate !== event.endDate">
+            - {{ formatDate(event.endDate) }}
+          </ng-container>
+        </ion-item>
+        <ion-item>
+          <ng-container *ngIf="event.startTime === '00:00:00' && event.endTime === '00:00:00'">
+            Ganztägig
+          </ng-container>
+          <ng-container *ngIf="event.startTime !== '00:00:00' || event.endTime !== '00:00:00'">
+            {{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}
+          </ng-container>
+        </ion-item> 
+        <ion-item>
+          <ng-container *ngIf="event.isAccessibleForFree">
+            Kostenlos
+          </ng-container>
+        </ion-item>
+        <ion-item>
+          {{ attraction.description.de }}
+        </ion-item>
+      </ion-list>
+</ion-content>

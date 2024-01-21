@@ -48,7 +48,7 @@
     </ion-header>
       <ion-list>
       <ng-container *ngFor="let event of events?.events">
-      <ion-card *ngFor="let attraction of event.attractions" (click)="showAttractionDetails(attraction.referenceId, event.locations[0].referenceId)">
+      <ion-card *ngFor="let attraction of event.attractions" (click)="showAttractionDetails(attraction.referenceId, event.locations[0].referenceId, event.schedule.startDate, event.schedule.endDate, event.schedule.startTime, event.schedule.endTime, event.admission?.ticketType)">
         <ion-card-header>
           <ion-card-title class="mouse-pointer">
             {{ attraction.referenceLabel.de }}
