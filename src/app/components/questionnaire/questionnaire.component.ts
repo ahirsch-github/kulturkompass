@@ -10,6 +10,29 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class QuestionnaireComponent implements OnInit {
   questionForm: FormGroup;
+  categories = [
+    { "identifier": "attraction.category.Walks", "title": "Spaziergänge, Ausflüge" },
+    { "identifier": "attraction.category.Dance", "title": "Tanz, Theater" },
+    { "identifier": "attraction.category.Lectures", "title": "Lesungen, Vorträge" },
+    { "identifier": "attraction.category.Politics", "title": "Politik, Bürgerservice" },
+    { "identifier": "attraction.category.Festivals", "title": "Feste, Events" },
+    { "identifier": "attraction.category.Seniors", "title": "Senioren" },
+    { "identifier": "attraction.category.WeeklyMarkets", "title": "Wochen- und Flohmärkte" },
+    { "identifier": "attraction.category.Music", "title": "Musik, Konzerte" },
+    { "identifier": "attraction.category.Exhibitions", "title": "Ausstellungen" },
+    { "identifier": "attraction.category.Conferences", "title": "Konferenzen, Messen" },
+    { "identifier": "attraction.category.Women", "title": "Frauen" },
+    { "identifier": "attraction.category.Art", "title": "Kunst, Kultur" },
+    { "identifier": "attraction.category.Stages", "title": "Bühnen, Filme" },
+    { "identifier": "attraction.category.Education", "title": "Bildung, Schule" },
+    { "identifier": "attraction.category.Police", "title": "Polizei" },
+    { "identifier": "attraction.category.Children", "title": "Kinder, Jugendliche" },
+    { "identifier": "attraction.category.Health", "title": "Gesundheit, Umwelt" },
+    { "identifier": "attraction.category.Recreation", "title": "Freizeit, Sport" },
+    { "identifier": "attraction.category.InformationEvents", "title": "Infoveranstaltungen" },
+    { "identifier": "attraction.category.ChristmasTime", "title": "Weihnachtszeit, Jahreswechsel" }
+  ];
+
 
   constructor(
     private modalCtrl: ModalController,
@@ -17,8 +40,8 @@ export class QuestionnaireComponent implements OnInit {
     private fb: FormBuilder
     ) {
       this.questionForm = this.fb.group({
-        eventTopics: this.fb.array([]),
-        eventTypes: this.fb.array([]),
+        accessibilityPreferences: this.fb.array([]),
+        eventCategories: this.fb.array([]),
         costs: this.fb.array([]),
         districts: this.fb.array([])
       });

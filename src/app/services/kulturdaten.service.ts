@@ -29,8 +29,8 @@ export class KulturdatenService {
       );
   }
 
-  getFutureEvents(pageSize: number = 278, body: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/events/search?pageSize=${pageSize}`, body, { headers: this.headers })
+  getFutureEvents(pageSize: number = 278,page: number, body: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/events/search?pageSize=${pageSize}&&page=${page}`, body, { headers: this.headers })
       .pipe(
         catchError(this.handleError)
       );
@@ -105,6 +105,13 @@ export class KulturdatenService {
 
   getLocations(): Observable<any> {
     return this.http.get(`${this.baseUrl}/locations`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getTags(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/tags`)
       .pipe(
         catchError(this.handleError)
       );

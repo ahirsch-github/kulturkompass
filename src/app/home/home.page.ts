@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { QuestionnaireComponent } from '../components/questionnaire/questionnaire.component';
 import { ModalController } from '@ionic/angular';
 import { CookieService } from 'ngx-cookie-service';
@@ -12,8 +14,16 @@ import { FormGroup, FormBuilder } from '@angular/forms';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
-  eventCat: { eventTopics?: string[], eventTypes?: string[], costs?: string[], districts?: string[] } | undefined = undefined;
+  eventCat: { 
+    accessibilityPreferences?: string[], 
+    eventCategories?: string[], 
+    costs?: string[], 
+    districts?: string[] 
+  } | undefined = undefined;
   events: any;
+  attractions: any;
+  availableTags: any;
+  page: number = 0;
 
   constructor(
     private modalCtrl: ModalController,
@@ -29,13 +39,51 @@ export class HomePage implements OnInit {
 
   loadEvents() {
     const body = {inTheFuture:true, };
-    this.kulturdatenService.getFutureEvents(278, body).subscribe(events => {
+    this.kulturdatenService.getFutureEvents(278,this.page, body).subscribe(events => {
       this.events = events.data.events;
-      if (this.eventCat && this.eventCat.costs && this.eventCat.costs.includes('free')) {
-        console.log('EventType: ', "free");
-        this.events = this.events.filter((event: any) => event.admission && event.admission.ticketType === 'ticketType.freeOfCharge');
+  
+      // Create an array of observables
+      const observables = this.events.map((event: any) => {
+        return this.kulturdatenService.getAttractionById(event.attractions[0].referenceId).pipe(
+          tap(attraction => {
+            event.attraction = attraction.data.attraction;
+          })
+        );
+      });
+  
+      // Use forkJoin to wait for all observables to complete
+      forkJoin(observables).subscribe(() => {
+        if (this.eventCat && this.eventCat.costs && this.eventCat.costs.includes('free')) {
+          console.log('EventType: ', "free");
+          this.events = this.events.filter((event: any) => event.admission && event.admission.ticketType === 'ticketType.freeOfCharge');
+        }
+      // filter events by Categorytags from questionnaire
+      if (this.eventCat && this.eventCat.eventCategories && this.eventCat.eventCategories.length > 0) {
+        this.events = this.events.filter((event: any) => {
+          return event.attraction.tags.some((tag: any) => {
+            const isTagIncluded = this.eventCat?.eventCategories?.includes(tag);
+            return isTagIncluded;
+          });
+        });
       }
-      console.log('Events: ', this.events);
+
+      // filter events by accessibilityTag from questionnaire
+      if (this.eventCat && this.eventCat.accessibilityPreferences && this.eventCat.accessibilityPreferences.length > 0) {
+        this.events = this.events.filter((event: any) => {
+          return event.attraction.tags.some((tag: any) => {
+            const isTagIncluded = this.eventCat?.accessibilityPreferences?.includes(tag);
+            return isTagIncluded;
+          });
+        });
+      }
+        
+        //console.log('Events: ', this.events);
+        //console.log('Example Attraction: ', this.events[0].attraction);
+        if (this.events && this.events.length < 1 && this.page < 10) {
+          this.page += 1;
+          this.loadEvents();
+        }
+      });
     });
   }
 
@@ -46,6 +94,7 @@ export class HomePage implements OnInit {
   formatTime(time: string): string {
     return time.substr(0, 5) || '';
   }
+
   
   private persolanizeEventCat() {
     const userTypeCookie = this.cookieService.get('userType');
