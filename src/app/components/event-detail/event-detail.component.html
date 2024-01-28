@@ -8,33 +8,42 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding">
-  <ion-title>{{ attraction.title.de }}</ion-title>
-      <ion-list [inset]="true">
-        <ion-item>
-          {{ location.address.streetAddress }} {{ location.address.postalCode }}, {{ location.address.addressLocality }}, {{ location.borough }}
-        </ion-item>
-        <ion-item>
-          {{ formatDate(event.startDate) }}
-          <ng-container *ngIf="event.startDate !== event.endDate">
-            - {{ formatDate(event.endDate) }}
-          </ng-container>
-        </ion-item>
-        <ion-item>
-          <ng-container *ngIf="event.startTime === '00:00:00' && event.endTime === '00:00:00'">
-            Ganztägig
-          </ng-container>
-          <ng-container *ngIf="event.startTime !== '00:00:00' || event.endTime !== '00:00:00'">
-            {{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}
-          </ng-container>
-        </ion-item> 
-        <ion-item>
-          <ng-container *ngIf="event.isAccessibleForFree">
-            Kostenlos
-          </ng-container>
-        </ion-item>
-        <ion-item>
-          {{ attraction.description.de }}
-        </ion-item>
-      </ion-list>
+
+<ion-content class="ion-padding" color="473077">
+
+  <div class="title-frame-item">
+    <div class="title-item">
+      <ion-text>{{ attraction.title.de }}</ion-text>
+    </div>
+  </div>
+
+  <ion-list [inset]="true">
+    <ion-item class="detail-item">
+      🗺️ {{ location.address.streetAddress }} {{ location.address.postalCode }}, {{ location.address.addressLocality }}, {{ location.borough }}
+    </ion-item>
+    <ion-item class="detail-item">
+      📅 {{ formatDate(event.startDate) }}
+      <ng-container *ngIf="event.startDate !== event.endDate">
+        - {{ formatDate(event.endDate) }}
+      </ng-container>
+    </ion-item>
+    <ion-item class="detail-item">
+      <ng-container *ngIf="event.startTime === '00:00:00' && event.endTime === '00:00:00'">
+      ⌛  Ganztägig
+      </ng-container>
+      <ng-container *ngIf="event.startTime !== '00:00:00' || event.endTime !== '00:00:00'">
+       ⏰ {{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}
+      </ng-container>
+    </ion-item>
+    <ion-item class="detail-item">
+      <ng-container *ngIf="event.isAccessibleForFree">
+      💰  Kostenlos
+      </ng-container>
+    </ion-item>
+    <ion-item class="detail-item">
+     💡 Details <br> {{ attraction.description.de }}
+    </ion-item>
+  </ion-list>
+  <br>
+
 </ion-content>

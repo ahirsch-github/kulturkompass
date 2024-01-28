@@ -1,0 +1,35 @@
+.title-frame-item {
+    width: 100%;
+    height: 25%;
+    border-radius: 0 0 15% 15%; /* Border radius an der unteren Seite */
+    background-color: #473077; /* Hintergrundfarbe */
+    display: flex;
+    align-items: center; /* Zentrierung des Inhalts vertikal */
+    justify-content: center; /* Zentrierung des Inhalts horizontal */
+    background-image: repeating-linear-gradient(#473077, #271a44);
+  }
+  
+  .title-item {
+    text-align: center; /* Zentrierung des Textes im Container */
+    padding-top: 5%;
+    padding-left: 2%;
+    padding-right: 2%;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 150%; /* 20% größer als andere Textelemente */
+    color: #ffffff; /* Textfarbe */
+    background-color: transparent; /* Kein Texthintergrund/Markierung */
+  }
+
+.detail-list {
+    background-color: transparent; /* Hintergrund: transparent */
+    border: none; /* Keine Linien zwischen den Reihen */
+    
+  }
+.detail-item{
+    background-color: transparent;
+    border: none;
+    line-height: 2;
+    //text-align: justify;
+    padding: 2% 0;
+}
