@@ -13,7 +13,6 @@
 
 <ion-footer>
   <ion-toolbar class="centered-container" style="padding-top: 0;">
-    <!-- centered title -->
     <ion-item lines="none" class="centered-title">
       <ion-title class="ion-centered-text" style="margin-top: 5px; padding-inline: 0;" >Entfernung eingrenzen</ion-title>
     </ion-item>
@@ -28,10 +27,9 @@
         <ion-label>Aktuellen Standort nutzen</ion-label>
       </div>
     </ion-item>
-    <ion-item *ngIf="showDistrictFilter != false" lines="none" class="centered-title">
+    <ion-item lines="none" class="centered-title">
       <div class="center-content">
         <div>
-          <!-- TODO: placeholder mit aktuellem Bezirk ersetzen -->
           <ion-select label="Bezirk" placeholder="" (ionChange)="onSelectionChange($event)">
             <ion-select-option value="mitte">Mitte</ion-select-option>
             <ion-select-option value="friedrichshain">Friedrichshain-Kreuzberg</ion-select-option>
@@ -49,9 +47,9 @@
         </div>
       </div>
     </ion-item>
-    <ion-item lines="none" class="centered-title">
+    <ion-item lines="none" class="centered-title" style="padding-bottom: 20px;">
       <div class="center-content">
-        <ion-button style="--padding-top: 11px;
+        <ion-button color="primary" style="--padding-top: 11px;
         --padding-bottom: 11px;
         --padding-start: 1.2em;
         --padding-end: 1.2em;"  (click)="confirmLocation()">Ergebnisse anzeigen</ion-button>

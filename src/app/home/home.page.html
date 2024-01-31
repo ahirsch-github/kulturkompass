@@ -1,2 +1,50 @@
-<app-search-bar></app-search-bar>
-<p>Home page works</p>
+<app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
+<ion-content>
+  <ion-list *ngIf="!isLoading">
+    <ng-container *ngFor="let event of events">
+      <ion-card *ngFor="let attraction of event.attractions" (click)="showAttractionDetails(attraction.referenceId, event.locations[0].referenceId, event.schedule.startDate, event.schedule.endDate, event.schedule.startTime, event.schedule.endTime, event.admission?.ticketType)">
+        <ion-card-header>
+          <ion-card-title class="mouse-pointer" color="secondary">
+            {{ attraction.referenceLabel.de }}
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div>
+            <strong>Datum:</strong> {{ formatDate(event.schedule.startDate) }}
+            <ng-container *ngIf="event.schedule.startDate !== event.schedule.endDate">
+              - {{ formatDate(event.schedule.endDate) }}
+            </ng-container>          
+          </div>
+          <div>
+            <strong color="secondary">Zeit:</strong> 
+            <ng-container *ngIf="event.schedule.startTime === '00:00:00' && event.schedule.endTime === '00:00:00'">
+              Ganztägig
+            </ng-container>
+            <ng-container *ngIf="event.schedule.startTime !== '00:00:00' || event.schedule.endTime !== '00:00:00'">
+              {{ formatTime(event.schedule.startTime) }} - {{ formatTime(event.schedule.endTime) }}
+            </ng-container>
+          </div>
+          <div class="mouse-pointer">
+            <strong>Ort:</strong>
+            <span *ngFor="let location of event.locations; let isLast=last">
+              {{ location.referenceLabel.de }}{{isLast ? '' : ', '}}
+            </span>
+          </div>
+          <div *ngIf="event.admission && event.admission.ticketType === 'ticketType.freeOfCharge'">
+            <strong>Eintritt:</strong> Kostenlos
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+  </ion-list>
+  <ng-container *ngIf="events?.length === 0 && !isLoading">
+    <p style="margin-left: 15px;">
+      Es wurden leider keine passenden Veranstaltungen gefunden.
+    </p>
+  </ng-container>
+  <ng-container *ngIf="isLoading">
+    <div style="display: flex; justify-content: center; margin-top: 5rem;">
+      <ion-spinner style="height: 3rem; width: 3rem;" name="bubbles" color="primary"></ion-spinner>
+    </div>
+  </ng-container>
+</ion-content>

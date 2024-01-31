@@ -23,20 +23,45 @@ export class KulturdatenService {
   }
 
   getEventsByPage(page: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/events?page=${page}`)
+    const body = {
+      inTheFuture: true
+    };
+
+    return this.http.post(`${this.baseUrl}/events/search?&page=${page}`, body, { headers: this.headers })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getFutureEvents(pageSize: number = 278, page: number): Observable<any> {
+    const body = {
+      inTheFuture: true 
+    };
+    return this.http.post(`${this.baseUrl}/events/search?pageSize=${pageSize}&&page=${page}`, body, { headers: this.headers })
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getEventsByAttractionIds(attractionIds: string[], page: number): Observable<any> {
+    const today = new Date().toISOString().split('T')[0];
     const body = {
       searchFilter: {
-        "attractions.referenceId": {
-            "$in": attractionIds
-        }
+        "$and": [
+          {
+            "attractions.referenceId": {
+              "$in": attractionIds
+            }
+          },
+          {
+            "schedule.startDate": {
+              "$gte": today
+            }
+          }
+        ]
       }
     };
+    
     return this.http.post(`${this.baseUrl}/events/search?pageSize=2000`, body, { headers: this.headers })
       .pipe(
         catchError(this.handleError)
@@ -103,6 +128,13 @@ export class KulturdatenService {
       );
   }
 
+  getTags(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/tags`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   getCoordinates(street: string, city: string, postalCode: string): Observable<any> {
 
     const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
@@ -126,7 +158,6 @@ export class KulturdatenService {
   }
 
   getLocationsByPage(page: number): Observable<any> {
-    console.log('getLocationsByPage');
     return this.http.get(`${this.baseUrl}/locations?page=${page}`)
       .pipe(
         catchError(this.handleError)
@@ -215,11 +246,13 @@ export class KulturdatenService {
     if (isFree) {
       filters.push({ 'admission.ticketType': 'ticketType.freeOfCharge' });
     }
+
+    const today = new Date().toISOString().split('T')[0];
+
+    filters.push({ 'schedule.startDate': { "$gte": today } });
     
     const filter = filters.length > 1 ? { '$and': filters } : filters[0] || {};
     const body = { searchFilter: filter };
-
-    console.log(body);
     
     return this.http.post(`${this.baseUrl}/events/search?pageSize=300`, body, { headers: this.headers })
       .pipe(catchError(this.handleError));

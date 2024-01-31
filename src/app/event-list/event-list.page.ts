@@ -3,6 +3,7 @@ import { KulturdatenService } from '../services/kulturdaten.service';
 import { InfiniteScrollCustomEvent, IonMenu, MenuController, ModalController } from '@ionic/angular';
 import { DatePipe } from '@angular/common';
 import { FilterMenuComponent } from '../components/filter-menu/filter-menu.component';
+import { EventDetailComponent } from '../components/event-detail/event-detail.component';
 
 @Component({
   selector: 'app-event-list',
@@ -33,6 +34,8 @@ export class EventListPage implements OnInit {
   };
   selectedCategoryNames: string[] = [];
   selectedAccessibilityNames: string[] = [];
+  isLoading = false;
+  isReloading = false;
 
   async openFilterMenuModal() {
     const modal = await this.modalControlle.create({
@@ -63,7 +66,6 @@ export class EventListPage implements OnInit {
         this.filters.accessibilities.forEach((accessibility: any) => {
           this.selectedAccessibilityNames.push(accessibility.name);
         });
-
         this.searchEventsbyFilters();
       }
     });
@@ -108,6 +110,9 @@ export class EventListPage implements OnInit {
   }
 
   private loadEvents(): void {
+    if (!this.isReloading) {
+      this.isLoading = true;
+    }
     this.isFilteredFlag = false;
     this.idsToFilter = [];
     const page = this.eventPage + 1;
@@ -117,10 +122,14 @@ export class EventListPage implements OnInit {
       } else {
         this.events = response.data;
       }
+      this.isLoading = false;
       this.eventPage = page;
       if(response.data.totalCount / 30 < this.eventPage) {
         this.allEventsListed = true;
         console.log('All events listed');
+      }
+      if (this.isReloading) {
+        this.isReloading = false;
       }
     }, error => {
       console.error('Ein Fehler ist aufgetreten:', error);
@@ -139,6 +148,7 @@ export class EventListPage implements OnInit {
     if(this.isFilteredFlag) {
       return;
     } else {
+      this.isReloading = true;
       this.loadEvents();
     }
     setTimeout(() => {
@@ -158,6 +168,7 @@ export class EventListPage implements OnInit {
   }
 
   searchEventsbyFilters(): void {
+    this.isLoading = true;
     const locationIds: string[] = [];
     const accessibilityIds = this.filters.accessibilities.map((accessibility: any) => accessibility.id);
     this.kulturdatenService.searchLocationsByBoroughAndTag(this.filters.boroughs, accessibilityIds).subscribe(response => {
@@ -176,15 +187,14 @@ export class EventListPage implements OnInit {
 
       const attractionIds: string[] = [];
       const attractionTags = this.filters.categories.map((category: any) => category.id);
-      console.log(attractionTags);
       this.kulturdatenService.searchAttractionByCategory(attractionTags).subscribe(response => {
-        console.log(response.data.attractions);
         attractionIds.push(...response.data.attractions.map((attraction: any) => attraction.identifier));
 
         this.kulturdatenService.searchEventsbyFilters(this.filters.dates, timeFilters, this.filters.isFreeOfChargeSelected, locationIds, attractionIds).subscribe(response => {
           this.events = response;
           this.events = response.data;
-          this.isFilteredFlag = true;      
+          this.isFilteredFlag = true;
+          this.isLoading = false;      
         });
       });
     }, error => {
@@ -192,16 +202,49 @@ export class EventListPage implements OnInit {
     });
   }
 
-  showAttractionDetails(attractionId: any, locationId: any): void {
-    console.log(attractionId);
-    console.log(locationId);
+  async showAttractionDetails(attractionId: any, locationId: any, eventStartDate: any, eventEndDate: any, eventStartTime: any, eventEndTime: any, eventIsFreeOfCharge: any) {
+    this.kulturdatenService.getAttractionById(attractionId).subscribe(response => {
+
+      let attraction = response.data.attraction;
+
+      this.kulturdatenService.getLocationById(locationId).subscribe(async response => {
+        const modal = await this.modalControlle.create({
+          component: EventDetailComponent,
+          cssClass: 'event-details-modal',
+          componentProps: {
+            attraction: attraction,
+            location: response.data.location,
+            event: {
+              startDate: eventStartDate,
+              endDate: eventEndDate,
+              startTime: eventStartTime,
+              endTime: eventEndTime,
+              isAccessibleForFree: eventIsFreeOfCharge
+            }
+          }
+        });
+        await modal.present();
+        modal.onDidDismiss().then((dataReturned) => {
+          if (dataReturned.data) {
+            (dataReturned.data);
+          }
+        });
+      }, error => {
+        console.error('Ein Fehler ist aufgetreten:', error);
+      });
+    }, error => {
+      console.error('Ein Fehler ist aufgetreten:', error);
+    });
   }
 
   searchAttractionsbyTerm(term: any): void {
+    this.isLoading = true;
     this.kulturdatenService.searchAttractions(term).subscribe(response => {
       this.attractions = response;
       this.idsToFilter = this.extractAttractionIds();
       this.loadFilteredEvents();
+      this.isFilteredFlag = true;
+      this.isLoading = false;
     }, error => {
       console.error('Ein Fehler ist aufgetreten:', error);
     });

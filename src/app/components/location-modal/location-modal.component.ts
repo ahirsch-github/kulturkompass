@@ -1,7 +1,8 @@
-import { ModalController } from '@ionic/angular';
+import { ModalController, isPlatform } from '@ionic/angular';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { BerlinBezirkeLatLng } from 'src/app/enums/berlin-bezirke-latlng';
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-location-modal',
@@ -14,7 +15,7 @@ export class LocationModalComponent implements OnInit {
   currentMarker: L.Marker | undefined;
   @Input() selectedLocation: L.LatLngExpression | undefined;
   @Input() selectedRadius: number | undefined;
-  @Input() showDistrictFilter!: boolean | true;
+  defaultLocation: L.LatLngExpression = [52.5200, 13.4050];
 
   constructor(private modalCtrl: ModalController) {}
   
@@ -22,8 +23,6 @@ export class LocationModalComponent implements OnInit {
     if (!this.selectedRadius) {
       this.selectedRadius = 3;
     }
-    console.log(this.selectedLocation);
-    console.log(this.selectedRadius);
   }
 
   ngAfterViewInit() {
@@ -51,13 +50,30 @@ export class LocationModalComponent implements OnInit {
 
   initMap(): void {
     if (!this.selectedLocation) {
-      this.selectedLocation = [52.5200, 13.4050]; // Berlin Mitte
+      this.selectedLocation = this.defaultLocation; // Berlin Mitte
     }
   
     this.map = L.map('modal-map').setView(this.selectedLocation, 13);
     this.map.zoomControl.remove();
-  
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    let tiles;
+
+    if (prefersDark) {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap, © Stadia Maps'
+      });
+    } else {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap contributors, © Stadia Maps'
+      });
+    }
+    tiles.addTo(this.map);
   
     this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
   
@@ -168,12 +184,31 @@ export class LocationModalComponent implements OnInit {
   }
 
   useCurrentLocation(): void {
-    console.log('use current location');
-    this.map.locate();
-    this.map.on('locationfound', this.onLocationFound);
-    this.map.on('locationerror', this.onLocationError);
+    this.getLocation();
   }
 
+  async getLocation() {
+    let position: any;
+
+    if (isPlatform('hybrid')) {
+      
+      // Use Capacitor's Geolocation API for iOS and Android
+      position = await Geolocation.getCurrentPosition();
+      // set coordinates if position is found, otherwise use default location
+      if (position) {
+        this.selectedLocation = [position.coords.latitude, position.coords.longitude];
+      } else {
+        this.selectedLocation = this.defaultLocation;
+      }
+      this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
+
+    } else {
+      this.map.locate();
+      this.map.on('locationfound', this.onLocationFound);
+      this.map.on('locationerror', this.onLocationError);
+    }
+  }
+  
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
     this.selectedLocation = e.latlng;
     this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);

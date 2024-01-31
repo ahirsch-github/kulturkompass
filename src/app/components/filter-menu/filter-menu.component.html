@@ -8,10 +8,20 @@
 </ion-header>
 <ion-content class="filter-menu ion-padding">
   <ion-list>
+    <!-- if the geolocation information is available, the radius filter can be used
     <ion-item>
       <ion-icon name="pin" slot="start"></ion-icon>
-      <ion-label>Ort</ion-label>
+      <ion-label>Umkreis auswählen</ion-label>
       <ion-icon style="cursor: pointer;" (click)="openLocationSelectionModal()" slot="end" fill="clear" size="small" name="chevron-forward-outline"></ion-icon>
+    </ion-item> -->
+    <ion-item>
+      <ion-icon name="pin" slot="start"></ion-icon>
+      <ion-label>Bezirk</ion-label>
+      <ion-select [(ngModel)]="selectedBoroughs" (ionChange)="handleBoroughChange($event)" label="Bezirk" interface="popover" [multiple]="true" [compareWith]="compareWithDt">
+        <ion-select-option *ngFor="let borough of boroughs" [value]="borough.name">
+          {{ borough.name }}
+        </ion-select-option>
+      </ion-select>
     </ion-item>
     <ion-item>
       <ion-icon name="calendar" slot="start"></ion-icon>
@@ -32,14 +42,6 @@
       <ion-toggle [(ngModel)]="isFreeOfChargeSelected" (ionChange)="handlePriceChange($event)" aria-label="Nur kostenlos" label ="Nur kostenlos" slot="end"></ion-toggle>
     </ion-item>
     <ion-item>
-      <ion-icon name="pin" slot="start"></ion-icon>
-      <ion-select [(ngModel)]="selectedBoroughs" (ionChange)="handleBoroughChange($event)" label="Bezirk" interface="popover" [multiple]="true" [compareWith]="compareWithDt">
-        <ion-select-option *ngFor="let borough of boroughs" [value]="borough.name">
-          {{ borough.name }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item>
       <ion-icon name="receipt-outline" slot="start"></ion-icon>
       <ion-select [(ngModel)]="selectedCategories" (ionChange)="handleCategoryChange($event)" interface="popover" label="Kategorie" [multiple]="true" [compareWith]="compareWith">
         <ion-select-option *ngFor="let category of categories" [value]="category">
@@ -56,11 +58,15 @@
       </ion-select>
     </ion-item>
   </ion-list>
-  <ion-button expand="block" class="ion-padding" (click)="applyFilters()">Filter anwenden</ion-button>
-  <ion-button style="--background: none; font-size: 0.8rem;" fill="clear" expand="block" class="" (click)="resetFilters()">
-    <ion-icon name="trash-outline" slot="start"></ion-icon>
-    Filter zurücksetzen</ion-button>
 </ion-content>
+<ion-footer>
+  <ion-toolbar style="padding-bottom: 20px;">
+    <ion-button expand="block" class="ion-padding" (click)="applyFilters()">Filter anwenden</ion-button>
+    <ion-button style="--background: none; font-size: 0.8rem;" fill="clear" expand="block" class="" (click)="resetFilters()">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Filter zurücksetzen</ion-button>
+  </ion-toolbar>
+</ion-footer>
 <ion-modal [keepContentsMounted]="true">
   <ng-template>
     <ion-datetime [(ngModel)]="selectedDates" id="datetime" (ionChange)="handleDateChange($event)" [multiple]="true" presentation="date" [value]="selectedDates">

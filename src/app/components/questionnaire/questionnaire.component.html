@@ -1,79 +1,54 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Willkommen</ion-title>
+    <ion-title>Willkommen zu unserer Umfrage</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding" [fullscreen]="true">
-  <form (ngSubmit)="submitAnswers()" [formGroup]="questionForm">
     <ion-list lines="none" class="questionnaire-content">
-      <ion-label class="intro-text">
-        <p>Um die Benutzererfahrung zu verbessern, bitten wir Sie, einige Fragen zu beantworten.</p>
+      <ion-label>
+        <p class="intro-text">Um die Benutzererfahrung zu verbessern, können Sie einige Fragen zu Ihren Präferenzen zu beantworten.</p>
       </ion-label>
-        <ion-label class="question-text">Welcher Veranstaltungen interessieren Sie?</ion-label>
-        <ion-segment formControlName="eventType">
-          <ion-segment-button value="music">
-            <ion-label>Musik</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="theater">
-            <ion-label>Theater</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="sports">
-            <ion-label>Sport</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="workshops">
-            <ion-label>Workshops</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="exhibitions">
-            <ion-label>Kunst</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <ion-label class="question-text">Wie oft besuchen Sie Events?</ion-label>
-        <ion-segment formControlName="frequency">
-          <ion-segment-button value="weekly">
-            <ion-label>Wöchentlich</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="monthly">
-            <ion-label>Monatlich</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="rarely">
-            <ion-label>Selten</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <ion-label class="question-text">Was ist Ihnen bei einem Event wichtig?</ion-label>
-        <ion-segment formControlName="priority">
-          <ion-segment-button value="free">
-            <ion-label>Kosten</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="exclusive">
-            <ion-label>Exklusivität</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="location">
-            <ion-label>Standort</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="type">
-            <ion-label>Art des Events</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <ion-label class="question-text">Wie mobil sind Sie für Events?</ion-label>
-        <ion-segment formControlName="mobility">
-          <ion-segment-button value="local">
-            <ion-label>Lokal</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="citywide">
-            <ion-label>Stadtweit</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="surrounding">
-            <ion-label>Umland</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="online">
-            <ion-label>Online</ion-label>
-          </ion-segment-button>
-        </ion-segment>
+      <ion-label class="question-text">Nur kostenlos?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="pricetag" slot="start"></ion-icon>
+        <ion-label>Kostenlos</ion-label>
+        <ion-toggle [(ngModel)]="filters.costs" aria-checked="false" [checked]="false" (ionChange)="onCheckboxChange($event, 'costs')"  aria-label="Nur kostenlos" label ="Nur kostenlos" slot="end"></ion-toggle>
+      </ion-item>
+
+      <ion-label class="question-text">Welche Art von Veranstaltungen bevorzugen Sie?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="receipt-outline" slot="start"></ion-icon>
+        <ion-select [(ngModel)]="filters.eventCategories" (ionChange)="onCheckboxChange($event, 'eventCategories')" label="Kategorie" interface="popover" [multiple]="true" [compareWith]="compareWith">
+          <ion-select-option *ngFor="let category of categories">
+            {{category.name}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-label class="question-text">Sind Sie Rollstuhlfahrer?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="accessibility-outline" slot="start"></ion-icon>
+        <ion-label>Rollstuhlfahrer</ion-label>
+        <ion-toggle [(ngModel)]="filters.accessibilityPreferences" aria-checked="false" [checked]="false" (ionChange)="onCheckboxChange($event, 'accessibilityPreferences')"  aria-label="Rollstuhlfahrer" label ="Rollstuhlfahrer" slot="end"></ion-toggle>
+      </ion-item>
+
+      <ion-label class="question-text">In welchen Bezirken möchten Sie Veranstaltungen besuchen?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="location-outline" slot="start"></ion-icon>
+        <ion-select [(ngModel)]="filters.boroughPreferences" (ionChange)="onCheckboxChange($event, 'boroughPreferences')" label="Bezirk" interface="popover" [multiple]="true" [compareWith]="compareWith">
+          <ion-select-option *ngFor="let borough of boroughs">
+            {{ borough.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
     </ion-list>
-    
     <div class="ion-padding">
-      <ion-button type="submit" expand="block" color="secondary">Einstellungen speichern</ion-button>
+      <ion-button type="submit" (click)="submitAnswers()" expand="block" color="primary">Präferenzen speichern</ion-button>
     </div>
-  </form>
 </ion-content>
