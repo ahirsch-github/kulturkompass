@@ -14,6 +14,7 @@ import { QuestionnaireComponent } from '../components/questionnaire/questionnair
 @NgModule({
   imports: [
     HomePageRoutingModule,
+    FormsModule,
     ReactiveFormsModule,
     SharedModuleModule,
     CommonModule,

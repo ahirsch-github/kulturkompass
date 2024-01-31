@@ -16,10 +16,6 @@ export class EventDetailComponent  implements OnInit {
   @Input() event: any;
 
   ngOnInit() {
-    console.log('EventDetailComponent ngOnInit');
-    console.log(this.attraction);
-    console.log(this.location);
-    console.log(this.event);
   }
 
   

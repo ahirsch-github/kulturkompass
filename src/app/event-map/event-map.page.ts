@@ -9,8 +9,10 @@ import { BerlinBezirke } from '../enums/berlin-bezirke';
 import { DatePipe } from '@angular/common';
 import 'leaflet.markercluster';
 import { MarkerClusterGroup } from 'leaflet';
+import { EventDetailComponent } from '../components/event-detail/event-detail.component';
 import { Geolocation } from '@capacitor/geolocation';
 import { isPlatform } from '@ionic/angular';  
+import { getGeom } from '@turf/turf';
 
 @Component({
   selector: 'app-event-map',
@@ -34,6 +36,7 @@ export class EventMapPage implements OnInit {
   isTomorrow: boolean = false;
   markerClusterGroup: L.MarkerClusterGroup | undefined;
   attractionIds: string[] = [];
+  isModalOpen: boolean = false;
 
   eventsByLocation: Map<string, any[]> = new Map<string, any[]>();
 
@@ -133,6 +136,8 @@ export class EventMapPage implements OnInit {
   }
 
   private applyFilters(): void {
+    console.log("applyFilters() called");
+    console.log(this.selectedLocation);
     if (this.map) {
       this.map.eachLayer((layer: any) => {
         if (layer instanceof L.CircleMarker) {
@@ -157,7 +162,12 @@ export class EventMapPage implements OnInit {
                       eventStart: event.schedule.startTime,
                       eventLocationTitle: location.title.de,
                       lat: coordinates.lat,
-                      lng: coordinates.lng
+                      lng: coordinates.lng,
+                      attractionId: event.attractions[0].referenceId,
+                      locationId: event.locations[0].referenceId,
+                      ticketType: event.ticketType,
+                      eventEndDate: event.schedule.endDate,
+                      eventEnd: event.schedule.endTime
                     }))
                   );
               })
@@ -176,7 +186,12 @@ export class EventMapPage implements OnInit {
   }
 
   setLocationAndRadius(): void {
+    console.log("setLocationAndRadius() called");
+    console.log(this.selectedLocation);
+    console.log(this.map);
     if (this.selectedRadius) {
+      console.log("selectedRadius");
+      console.log(this.selectedRadius);
       this.currentCircle = L.circle(this.selectedLocation, {
         radius: this.selectedRadius * 1000,
         color: '#473077',
@@ -185,6 +200,7 @@ export class EventMapPage implements OnInit {
         fillOpacity: 0.9,
         interactive: false
       }).addTo(this.map);    
+      console.log(this.currentCircle);
       const bounds = this.currentCircle.getBounds();
       const zoomLevel = this.map.getBoundsZoom(bounds);
       this.map.setView(this.selectedLocation, zoomLevel);
@@ -227,7 +243,6 @@ export class EventMapPage implements OnInit {
 
       let popupContent: string[] = [];
       events.forEach((event: any) => {
-        console.log(event.eventTitle);
         popupContent.push(`
           <h6>${event.eventTitle}</h6>
           <b>Wann?</b> ${this.formatDate(event.eventStartDate) + ', ' + this.formatTime(event.eventStart) + ' Uhr'}</br>
@@ -258,6 +273,18 @@ export class EventMapPage implements OnInit {
       this.map.on('popupopen', (e: any) => {
         const key = e.popup._source._latlng.lat + '-' + e.popup._source._latlng.lng;
 
+        const eventsAtLocation = this.eventsByLocation.get(key);
+        if (eventsAtLocation) {
+          let currentEventIndex = 0;
+          const popupContentElement = document.getElementById(`popupContent`);
+          if (popupContentElement && popupContentElement.firstElementChild) {
+            popupContentElement.firstElementChild.addEventListener('click', () => {
+              const currentEvent = eventsAtLocation[currentEventIndex];
+              this.showAttractionDetails(currentEvent.attractionId, currentEvent.locationId, currentEvent);
+            });
+          }
+        }
+
         let prevButton = document.getElementById(`prev-${key}`);
         if (prevButton) {
           prevButton.removeEventListener('click', () => this.prevEvent(key));
@@ -274,7 +301,7 @@ export class EventMapPage implements OnInit {
     });
     this.map.addLayer(this.markerClusterGroup);
   }
-
+  
   prevEvent(key: string): void {
     const currentIndex = this.carouselIndexMap.get(key) || 0;
     const events = this.eventsByLocation.get(key);
@@ -308,7 +335,11 @@ export class EventMapPage implements OnInit {
           <b>Wo? </b>${event.eventLocationTitle}</br>
           <hr>
         `;
+        contentElement.addEventListener('click', () => {
+          this.showAttractionDetails(event.attractionId, event.locationId, event);
+        });
       }
+     
     }
 
     const prevButton = document.getElementById(`prev-${key}`);
@@ -330,6 +361,45 @@ export class EventMapPage implements OnInit {
       }
     }
   }
+
+  async showAttractionDetails(attractionId: any, locationId: any, event: any): Promise<void> {
+    if (this.isModalOpen) {
+      return;
+    } else {
+      this.isModalOpen = true;
+      this.kulturdatenService.getAttractionById(attractionId).subscribe(response => {
+  
+        let attraction = response.data.attraction;
+  
+        this.kulturdatenService.getLocationById(locationId).subscribe(async response => {
+          const modal = await this.modalController.create({
+            component: EventDetailComponent,
+            cssClass: 'event-details-modal',
+            componentProps: {
+              attraction: attraction,
+              location: response.data.location,
+              event: {
+                startDate: event.eventStartDate,
+                endDate: event.eventEndDate,
+                startTime: event.eventStart,
+                endTime: event.eventEnd,
+                isAccessibleForFree: event.ticketType
+              }
+            }
+        });
+        await modal.present();
+        modal.onDidDismiss().then(() => {
+          this.isModalOpen = false;
+        });
+      }, error => {
+        console.error('Ein Fehler ist aufgetreten:', error);
+      });
+    }, error => {
+      console.error('Ein Fehler ist aufgetreten:', error);
+    });
+  }
+  }
+
   
 
   private initMap(): void {
@@ -369,49 +439,45 @@ export class EventMapPage implements OnInit {
       },
       maxClusterRadius: 40
     });
+    // this.getLocation();
 
-    this.map.locate({setView: true, maxZoom: 13});
-    this.getLocation();
+    if(isPlatform('hybrid')) {
+      this.getLocation();
+    } else {
+      this.getLocation();
+    }
+    
   }
 
-  async getLocation() {
-    let position: any;
 
-    if (isPlatform('hybrid')) {
-      console.log('hybrid');
-      
-      // Use Capacitor's Geolocation API for iOS and Android
-      position = await Geolocation.getCurrentPosition({timeout: 20000});
-      // set coordinates if position is found, otherwise use default location
-      if (position) {
-        this.selectedLocation = [position.coords.latitude, position.coords.longitude];
-
-        // if selected location is empty, use default location
-        if (this.selectedLocation.length === 0) {
-          this.selectedLocation = this.defaultLocation;
-        }
-        this.applyFilters();
-        this.setBezirk();
-      } else {
-        this.selectedLocation = this.defaultLocation;
-        this.applyFilters();
-        this.setBezirk();
-      }
-
-    } else {
-      console.log('web');
-      this.map.on('locationfound', this.onLocationFound);
-      this.map.on('locationerror', this.onLocationError);
-    }
+  private getLocation() {
+    this.map.locate({setView: true, maxZoom: 13});
+    this.map.on('locationfound', this.onLocationFound);
+    this.map.on('locationerror', this.onLocationError);
   }
 
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
+    console.log('location found');
     this.selectedLocation = e.latlng;
-    this.applyFilters();
-    this.setBezirk();
+    console.log(this.selectedLocation);
+
+    if (isPlatform('hybrid')) {
+      Geolocation.getCurrentPosition().then((resp) => {
+        this.selectedLocation = [resp.coords.latitude, resp.coords.longitude];
+        console.log(this.selectedLocation);
+        this.applyFilters();
+        this.setBezirk();
+      }).catch((error) => {
+        console.log('Error getting location', error);
+      });
+    } else {
+      this.applyFilters();
+      this.setBezirk();
+    }
   }
 
   private onLocationError = (e: any) => {
+    console.log('location error');
     console.error(e.message);
     this.selectedLocation = this.defaultLocation;
     this.applyFilters();

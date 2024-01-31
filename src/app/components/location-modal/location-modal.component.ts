@@ -15,7 +15,6 @@ export class LocationModalComponent implements OnInit {
   currentMarker: L.Marker | undefined;
   @Input() selectedLocation: L.LatLngExpression | undefined;
   @Input() selectedRadius: number | undefined;
-  @Input() showDistrictFilter!: boolean | true;
   defaultLocation: L.LatLngExpression = [52.5200, 13.4050];
 
   constructor(private modalCtrl: ModalController) {}
@@ -24,8 +23,6 @@ export class LocationModalComponent implements OnInit {
     if (!this.selectedRadius) {
       this.selectedRadius = 3;
     }
-    console.log(this.selectedLocation);
-    console.log(this.selectedRadius);
   }
 
   ngAfterViewInit() {
@@ -58,8 +55,25 @@ export class LocationModalComponent implements OnInit {
   
     this.map = L.map('modal-map').setView(this.selectedLocation, 13);
     this.map.zoomControl.remove();
-  
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    let tiles;
+
+    if (prefersDark) {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap, © Stadia Maps'
+      });
+    } else {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap contributors, © Stadia Maps'
+      });
+    }
+    tiles.addTo(this.map);
   
     this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
   
@@ -70,8 +84,6 @@ export class LocationModalComponent implements OnInit {
   }
   
   setMarkerAndRadius(location: any, radius: any): void {
-    console.log(location);
-    console.log(radius);
     if (this.currentMarker) {
       this.map.removeLayer(this.currentMarker);
     }
@@ -172,7 +184,6 @@ export class LocationModalComponent implements OnInit {
   }
 
   useCurrentLocation(): void {
-    console.log('use current location');
     this.getLocation();
   }
 
@@ -180,7 +191,6 @@ export class LocationModalComponent implements OnInit {
     let position: any;
 
     if (isPlatform('hybrid')) {
-      console.log('hybrid');
       
       // Use Capacitor's Geolocation API for iOS and Android
       position = await Geolocation.getCurrentPosition();
@@ -193,7 +203,6 @@ export class LocationModalComponent implements OnInit {
       this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
 
     } else {
-      console.log('web');
       this.map.locate();
       this.map.on('locationfound', this.onLocationFound);
       this.map.on('locationerror', this.onLocationError);
@@ -201,7 +210,6 @@ export class LocationModalComponent implements OnInit {
   }
   
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
-    console.log(e);
     this.selectedLocation = e.latlng;
     this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
   }

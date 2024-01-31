@@ -5,18 +5,19 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { HttpClientModule } from '@angular/common/http';
 import { KulturdatenService } from '../services/kulturdaten.service';
+import { EventDetailComponent } from '../components/event-detail/event-detail.component';
 
 
 
 @NgModule({
-  declarations: [SearchBarComponent],
+  declarations: [SearchBarComponent, EventDetailComponent],
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     HttpClientModule
   ],
-  exports: [SearchBarComponent, IonicModule],
+  exports: [SearchBarComponent, IonicModule, EventDetailComponent],
   providers: [KulturdatenService]
 })
 export class SharedModuleModule { }

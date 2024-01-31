@@ -21,28 +21,4 @@ export class SearchBarComponent  implements OnInit {
   onSearchChange(event: any): void {
     this.searchTerm.emit(event.target.value);
   }
-
-  attractionSearchbyTag(event: any): void {
-    console.log('Search started', event.target.value);
-    this.searchString = {
-      "searchFilter": {
-        "tags": {
-          "$in": [
-            "attraction.category.Lectures",
-            "attraction.category.Music"
-          ]
-        }
-      }
-    }
-    console.log('Search string', this.searchString);
-    this.kulturdatenService.searchAttractionsbyTag([AttractionTags.Lectures, AttractionTags.Music])
-    .subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-      error: (error) => {
-        console.error('Ein Fehler ist aufgetreten:', error);
-      }
-    });
-  }
 }

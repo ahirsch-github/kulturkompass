@@ -163,14 +163,12 @@ export class FilterMenuComponent  implements OnInit {
   }
 
   async openLocationSelectionModal() {
-    console.log('openLocationSelectionModal');
     const modal = await this.modalCtrl.create({
       component: LocationModalComponent,
       cssClass: 'half-height-modal',
       componentProps: {
         'selectedLocation': this.defaultLocation,
         'selectedRadius': 3,
-        'showDistrictFilter': false,
       }
     });
     await modal.present();

@@ -1,181 +1,54 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Willkommen</ion-title>
+    <ion-title>Willkommen zu unserer Umfrage</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" [fullscreen]="true" color="medium">
-  <form (ngSubmit)="submitAnswers()" [formGroup]="questionForm">
+<ion-content class="ion-padding" [fullscreen]="true">
     <ion-list lines="none" class="questionnaire-content">
-      <ion-label class="intro-text" color="primary">
-        <p>Um die Benutzererfahrung zu verbessern, bitten wir Sie, einige Fragen zu beantworten.</p>
+      <ion-label>
+        <p class="intro-text">Um die Benutzererfahrung zu verbessern, können Sie einige Fragen zu Ihren Präferenzen zu beantworten.</p>
       </ion-label>
+      <ion-label class="question-text">Nur kostenlos?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="pricetag" slot="start"></ion-icon>
+        <ion-label>Kostenlos</ion-label>
+        <ion-toggle [(ngModel)]="filters.costs" aria-checked="false" [checked]="false" (ionChange)="onCheckboxChange($event, 'costs')"  aria-label="Nur kostenlos" label ="Nur kostenlos" slot="end"></ion-toggle>
+      </ion-item>
 
-      <ion-label class="question-text">Veranstaltungsthemen:</ion-label>
-      <ion-checkbox-group formControlName="eventTopics">
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Musik</ion-label>
-              <ion-checkbox value="music" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Theater</ion-label>
-              <ion-checkbox value="theater" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Sport</ion-label>
-              <ion-checkbox value="sports" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Kunst</ion-label>
-              <ion-checkbox value="art" (ionChange)="onCheckboxChange($event, 'eventTopics')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-      </ion-checkbox-group>
+      <ion-label class="question-text">Welche Art von Veranstaltungen bevorzugen Sie?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="receipt-outline" slot="start"></ion-icon>
+        <ion-select [(ngModel)]="filters.eventCategories" (ionChange)="onCheckboxChange($event, 'eventCategories')" label="Kategorie" interface="popover" [multiple]="true" [compareWith]="compareWith">
+          <ion-select-option *ngFor="let category of categories">
+            {{category.name}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
 
-      <ion-label class="question-text">Veranstaltungstyp:</ion-label>
-      <ion-checkbox-group formControlName="eventTypes">
-        <ion-row>
-          <ion-col size="4">
-            <ion-item>
-              <ion-label>Teilnehmen</ion-label>
-              <ion-checkbox value="participate" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="4">
-            <ion-item>
-              <ion-label>Konsumieren</ion-label>
-              <ion-checkbox value="consume" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="4">
-            <ion-item>
-              <ion-label>Organisieren</ion-label>
-              <ion-checkbox value="organize" (ionChange)="onCheckboxChange($event, 'eventTypes')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-      </ion-checkbox-group>
+      <ion-label class="question-text">Sind Sie Rollstuhlfahrer?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="accessibility-outline" slot="start"></ion-icon>
+        <ion-label>Rollstuhlfahrer</ion-label>
+        <ion-toggle [(ngModel)]="filters.accessibilityPreferences" aria-checked="false" [checked]="false" (ionChange)="onCheckboxChange($event, 'accessibilityPreferences')"  aria-label="Rollstuhlfahrer" label ="Rollstuhlfahrer" slot="end"></ion-toggle>
+      </ion-item>
 
-      <ion-label class="question-text">Kosten:</ion-label>
-      <ion-checkbox-group formControlName="costs">
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Kostenlos</ion-label>
-              <ion-checkbox value="free" (ionChange)="onCheckboxChange($event, 'costs')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Für Geld</ion-label>
-              <ion-checkbox value="paid" (ionChange)="onCheckboxChange($event, 'costs')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-      </ion-checkbox-group>
-
-      <ion-label class="question-text">Bezirke:</ion-label>
-      <ion-checkbox-group formControlName="districts">
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Charlottenburg-Wilmersdorf</ion-label>
-              <ion-checkbox value="charlottenburg-wilmersdorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Friedrichshain-Kreuzberg</ion-label>
-              <ion-checkbox value="friedrichshain-kreuzberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Lichtenberg</ion-label>
-              <ion-checkbox value="lichtenberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Marzahn-Hellersdorf</ion-label>
-              <ion-checkbox value="marzahn-hellersdorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Mitte</ion-label>
-              <ion-checkbox value="mitte" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Neukölln</ion-label>
-              <ion-checkbox value="neukolln" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Pankow</ion-label>
-              <ion-checkbox value="pankow" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Reinickendorf</ion-label>
-              <ion-checkbox value="reinickendorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Spandau</ion-label>
-              <ion-checkbox value="spandau" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Steglitz-Zehlendorf</ion-label>
-              <ion-checkbox value="steglitz-zehlendorf" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Tempelhof-Schöneberg</ion-label>
-              <ion-checkbox value="tempelhof-schoneberg" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-label>Treptow-Köpenick</ion-label>
-              <ion-checkbox value="treptow-kopenick" (ionChange)="onCheckboxChange($event, 'districts')"></ion-checkbox>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-      </ion-checkbox-group>
+      <ion-label class="question-text">In welchen Bezirken möchten Sie Veranstaltungen besuchen?</ion-label>
+      <ion-item style="padding-top: 10px; padding-bottom: 15px;">
+        <ion-icon name="location-outline" slot="start"></ion-icon>
+        <ion-select [(ngModel)]="filters.boroughPreferences" (ionChange)="onCheckboxChange($event, 'boroughPreferences')" label="Bezirk" interface="popover" [multiple]="true" [compareWith]="compareWith">
+          <ion-select-option *ngFor="let borough of boroughs">
+            {{ borough.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
     </ion-list>
-
     <div class="ion-padding">
-      <ion-button type="submit" expand="block" color="secondary">Einstellungen speichern</ion-button>
+      <ion-button type="submit" (click)="submitAnswers()" expand="block" color="primary">Präferenzen speichern</ion-button>
     </div>
-  </form>
 </ion-content>

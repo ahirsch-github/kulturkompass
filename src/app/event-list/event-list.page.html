@@ -46,8 +46,8 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-      <ion-list>
-      <ng-container *ngFor="let event of events?.events" color="primary">
+      <ion-list *ngIf="!isLoading">
+      <ng-container *ngFor="let event of events?.events">
       <ion-card *ngFor="let attraction of event.attractions" (click)="showAttractionDetails(attraction.referenceId, event.locations[0].referenceId, event.schedule.startDate, event.schedule.endDate, event.schedule.startTime, event.schedule.endTime, event.admission?.ticketType)">
         <ion-card-header>
           <ion-card-title class="mouse-pointer" color="secondary">
@@ -86,4 +86,14 @@
       <ion-infinite-scroll-content loadingSpinner="bubbles">
       </ion-infinite-scroll-content>
     </ion-infinite-scroll>
+    <ng-container *ngIf="events?.events.length === 0 && !isLoading">
+      <p style="margin-left: 15px;">
+        Es wurden leider keine passenden Veranstaltungen gefunden.
+      </p>
+    </ng-container>
+    <ng-container *ngIf="isLoading">
+      <div style="display: flex; justify-content: center;">
+        <ion-spinner style="height: 3rem; width: 3rem;" name="bubbles" color="primary"></ion-spinner>
+      </div>
+    </ng-container>
   </ion-content>
