@@ -40,7 +40,36 @@ export class HomePage implements OnInit {
     this.showQuestionnaireIfNeeded();
     this.loadEvents();
   }
+  
+  /**
+   * Shows the questionnaire if it is the user's first time visiting the page.
+   * Otherwise, it personalizes the event categories.
+   * @returns {Promise<void>} A promise that resolves when the questionnaire is dismissed.
+   */
+  private async showQuestionnaireIfNeeded() {
+    const isFirstTime = localStorage.getItem('hasVisited') === null;
+    if (1==1) { //TODO: change to isFirstTime for production
+      const modal = await this.modalCtrl.create({
+        component: QuestionnaireComponent
+      });
+    
+      modal.onDidDismiss().then((data) => {
+        this.persolanizeEventCat();
+        this.loadEvents(); // reload the events after the questionnaire is dismissed
+      });
 
+      return await modal.present();
+    } else {
+      this.persolanizeEventCat();
+    }
+  }
+
+  /**
+   * Loads events based on selected preferences.
+   * First, it loads the locations based on the borough and accessibility preferences.
+   * Then, it loads the attractions based on the event categories.
+   * Finally, it loads the events based on the location- and attraction-ids.
+   */
   loadEvents() {
     this.isLoading = true;
     const locationIds: string[] = [];
@@ -62,14 +91,18 @@ export class HomePage implements OnInit {
     });
   }
 
-  formatDate(date: string): string {
-    return this.datePipe.transform(date, 'dd.MM.yyyy') || '';
-  }
-  
-  formatTime(time: string): string {
-    return time.substr(0, 5) || '';
-  }
-
+  /**
+   * Shows the details of an attraction by opening a modal with the EventDetailComponent.
+   * 
+   * @param attractionId - The ID of the attraction.
+   * @param locationId - The ID of the location.
+   * @param eventStartDate - The start date of the event.
+   * @param eventEndDate - The end date of the event.
+   * @param eventStartTime - The start time of the event.
+   * @param eventEndTime - The end time of the event.
+   * @param eventIsFreeOfCharge - Indicates if the event is free of charge.
+   * @returns A promise that resolves when the attraction details are shown.
+   */
   async showAttractionDetails(attractionId: any, locationId: any, eventStartDate: any, eventEndDate: any, eventStartTime: any, eventEndTime: any, eventIsFreeOfCharge: any) {
     this.kulturdatenService.getAttractionById(attractionId).subscribe(response => {
 
@@ -101,6 +134,10 @@ export class HomePage implements OnInit {
     });
   }
   
+  /**
+   * Persolanizes the event categories based on the user's preferences stored in the cookie 'userType'.
+   * If the user has selected any preferences, sets the 'isPersonalized' flag to true.
+   */
   private persolanizeEventCat() {
     const userTypeCookie = this.cookieService.get('userType');
     if (userTypeCookie) {
@@ -110,30 +147,17 @@ export class HomePage implements OnInit {
       if (this.eventCat && (this.eventCat.accessibilityPreferences || this.eventCat.eventCategories || this.eventCat.costs || this.eventCat.boroughPreferences)) {
         this.isPersonalized = true;
       }
-      console.log(this.eventCat);
     } else {
       console.log('userType cookie is not set');
     }
   }
-  
-  private async showQuestionnaireIfNeeded() {
-    const isFirstTime = localStorage.getItem('hasVisited') === null;
-    if (1==1) { //TODO: change to isFirstTime for production
-      const modal = await this.modalCtrl.create({
-        component: QuestionnaireComponent
-      });
-    
-      modal.onDidDismiss().then((data) => {
-        this.persolanizeEventCat();
-        this.loadEvents(); // reload the events after the questionnaire is dismissed
-      });
 
-      return await modal.present();
-    } else {
-      this.persolanizeEventCat();
-    }
-  }
-
+  /**
+   * Handles the start of a search.
+   * If the search term is empty, it resets the events list and loads the initial events.
+   * Otherwise, it performs a search for attractions based on the provided search term.
+   * @param data - The search term.
+   */
   onSearchStart(data: any): void {
     if (data === '') {
       this.events = null;
@@ -145,6 +169,10 @@ export class HomePage implements OnInit {
     this.searchAttractionsbyTerm(data);
   }
 
+  /**
+   * Searches attractions by the given term.
+   * @param term The term to search for attractions.
+   */
   private searchAttractionsbyTerm(term: any): void {
     this.isLoading = true;
     this.kulturdatenService.searchAttractions(term).subscribe(response => {
@@ -156,6 +184,9 @@ export class HomePage implements OnInit {
     });
   }
 
+  /**
+   * Loads events after searching for a specific term by searching for events based on the attraction ids.
+   */
   private loadEventsAfterSearchTerm(): void {
     this.kulturdatenService.getEventsByAttractionIds(this.idsToFilter, 0).subscribe(response => {
       this.events = response.data.events;
@@ -165,4 +196,11 @@ export class HomePage implements OnInit {
     });
   }
 
+  formatDate(date: string): string {
+    return this.datePipe.transform(date, 'dd.MM.yyyy') || '';
+  }
+  
+  formatTime(time: string): string {
+    return time.substr(0, 5) || '';
+  }
 }

@@ -92,6 +92,26 @@ export class EventMapPage implements OnInit {
   }
 
   /**
+   * Sets the location and radius for the event map and adds a circle to the map.
+   */
+  setLocationAndRadius(): void {
+    if (this.selectedRadius) {
+      this.currentCircle = L.circle(this.selectedLocation, {
+        radius: this.selectedRadius * 1000,
+        color: '#473077',
+        weight: 2,
+        fillColor: 'none',
+        fillOpacity: 0.9,
+        interactive: false
+      }).addTo(this.map);    
+      console.log(this.currentCircle);
+      const bounds = this.currentCircle.getBounds();
+      const zoomLevel = this.map.getBoundsZoom(bounds);
+      this.map.setView(this.selectedLocation, zoomLevel);
+    }
+  }
+
+  /**
    * Sets the bezirk (district) based on the selected location.
    * If the selected location matches a district's coordinates, the corresponding district name is assigned to `this.bezirk`.
    * If no district is found for the selected location, `this.bezirk` is set to 'Ausgewählter Standort' (Selected Location).
@@ -113,85 +133,9 @@ export class EventMapPage implements OnInit {
     }
   }
 
-  private applyFilters(): void {
-    console.log("applyFilters() called");
-    console.log(this.selectedLocation);
-    if (this.map) {
-      this.map.eachLayer((layer: any) => {
-        if (layer instanceof L.CircleMarker) {
-          this.map.removeLayer(layer);
-        }
-      });
-      this.setLocationAndRadius();
-
-      this.coordinatesList = [];
-      this.eventsList = [];
-      this.kulturdatenService.getEventsFilteredByChargeAndDayAndAttractionIds(this.isFree, this.isToday, this.isTomorrow, this.attractionIds).subscribe(filteredEvents => {
-        const locationRequests = filteredEvents.data.events.map((event: any) => {
-          return this.kulturdatenService.getLocationById(event.locations[0].referenceId)
-            .pipe(
-              switchMap((response) => {
-                let location = response.data.location;
-                return this.kulturdatenService.getCoordinates(location.address.streetAddress, location.address.addressLocality, location.address.postalCode)
-                  .pipe(
-                    map(coordinates => ({
-                      eventTitle: event.attractions[0].referenceLabel.de,
-                      eventStartDate: event.schedule.startDate,
-                      eventStart: event.schedule.startTime,
-                      eventLocationTitle: location.title.de,
-                      lat: coordinates.lat,
-                      lng: coordinates.lng,
-                      attractionId: event.attractions[0].referenceId,
-                      locationId: event.locations[0].referenceId,
-                      ticketType: event.ticketType,
-                      eventEndDate: event.schedule.endDate,
-                      eventEnd: event.schedule.endTime
-                    }))
-                  );
-              })
-            );
-        });
-
-        forkJoin(locationRequests).subscribe((results: any) => {
-          const eventsList: any[] = results as any[];
-          this.eventsList = eventsList.filter(eventInfo => {
-            return (eventInfo.lat !== 0 || eventInfo.lng !== 0) && this.isWithinRadius(eventInfo);
-          });
-          this.setMarkers();
-        });
-      });
-    }
-  }
-
-  setLocationAndRadius(): void {
-    console.log("setLocationAndRadius() called");
-    console.log(this.selectedLocation);
-    console.log(this.map);
-    if (this.selectedRadius) {
-      console.log("selectedRadius");
-      console.log(this.selectedRadius);
-      this.currentCircle = L.circle(this.selectedLocation, {
-        radius: this.selectedRadius * 1000,
-        color: '#473077',
-        weight: 2,
-        fillColor: 'none',
-        fillOpacity: 0.9,
-        interactive: false
-      }).addTo(this.map);    
-      console.log(this.currentCircle);
-      const bounds = this.currentCircle.getBounds();
-      const zoomLevel = this.map.getBoundsZoom(bounds);
-      this.map.setView(this.selectedLocation, zoomLevel);
-    }
-  }
-
-  isWithinRadius(eventCoordinates: { lat: number; lng: number; }) {
-    const center = L.latLng(this.selectedLocation);
-    const eventLocation = L.latLng(eventCoordinates.lat, eventCoordinates.lng);
-    const distance = center.distanceTo(eventLocation); // Distanz in Metern
-    return distance <= this.selectedRadius * 1000; // Umwandlung von km in Meter
-  }
-
+  /**
+   * Sets the markers on the map based on the events list, clusters them if more than one event is at the same location and adds a popup to each marker.
+   */
   private setMarkers(): void {
     this.eventsByLocation = new Map();
     this.markerClusterGroup?.clearLayers();
@@ -228,8 +172,6 @@ export class EventMapPage implements OnInit {
           <hr>
         `);
       });
-      
-
       
       const popup = L.popup({
         className: 'custom-popup',
@@ -280,6 +222,12 @@ export class EventMapPage implements OnInit {
     this.map.addLayer(this.markerClusterGroup);
   }
   
+  /**
+   * Moves to the previous event in the carousel for a given key.
+   * If there are no more previous events, the carousel remains unchanged.
+   * 
+   * @param key - The key associated with the carousel.
+   */
   prevEvent(key: string): void {
     const currentIndex = this.carouselIndexMap.get(key) || 0;
     const events = this.eventsByLocation.get(key);
@@ -291,7 +239,12 @@ export class EventMapPage implements OnInit {
       }
     }
   }
-
+  
+  /**
+   * Moves to the next event in the carousel for a given key.
+   * If there are no more next events, the carousel remains unchanged.
+   * @param key - The key to identify the events.
+   */
   nextEvent(key: string): void {
     const currentIndex = this.carouselIndexMap.get(key) || 0;
     const events = this.eventsByLocation.get(key);
@@ -302,6 +255,12 @@ export class EventMapPage implements OnInit {
     }
   }
 
+  /**
+   * Updates the content of the carousel for a specific event.
+   * 
+   * @param key - The key identifier for the carousel.
+   * @param event - The event object containing the event details.
+   */
   updateCarouselContent(key: string, event: any): void {
     const popupElement = document.getElementById(`popup-${key}`);
     if (popupElement) {
@@ -340,6 +299,75 @@ export class EventMapPage implements OnInit {
     }
   }
 
+  /**
+   * Applies filters to the map and retrieves events based on the selected location and other filter criteria.
+   */
+  private applyFilters(): void {
+    if (this.map) {
+      this.map.eachLayer((layer: any) => {
+        if (layer instanceof L.CircleMarker) {
+          this.map.removeLayer(layer);
+        }
+      });
+      this.setLocationAndRadius();
+      this.coordinatesList = [];
+      this.eventsList = [];
+      this.kulturdatenService.getEventsFilteredByChargeAndDayAndAttractionIds(this.isFree, this.isToday, this.isTomorrow, this.attractionIds).subscribe(filteredEvents => {
+        const locationRequests = filteredEvents.data.events.map((event: any) => {
+          return this.kulturdatenService.getLocationById(event.locations[0].referenceId)
+            .pipe(
+              switchMap((response) => {
+                let location = response.data.location;
+                return this.kulturdatenService.getCoordinates(location.address.streetAddress, location.address.addressLocality, location.address.postalCode)
+                  .pipe(
+                    map(coordinates => ({
+                      eventTitle: event.attractions[0].referenceLabel.de,
+                      eventStartDate: event.schedule.startDate,
+                      eventStart: event.schedule.startTime,
+                      eventLocationTitle: location.title.de,
+                      lat: coordinates.lat,
+                      lng: coordinates.lng,
+                      attractionId: event.attractions[0].referenceId,
+                      locationId: event.locations[0].referenceId,
+                      ticketType: event.ticketType,
+                      eventEndDate: event.schedule.endDate,
+                      eventEnd: event.schedule.endTime
+                    }))
+                  );
+              })
+            );
+        });
+        forkJoin(locationRequests).subscribe((results: any) => {
+          const eventsList: any[] = results as any[];
+          this.eventsList = eventsList.filter(eventInfo => {
+            return (eventInfo.lat !== 0 || eventInfo.lng !== 0) && this.isWithinRadius(eventInfo);
+          });
+          this.setMarkers();
+        });
+      });
+    }
+  }
+
+  /**
+   * Checks if the given event coordinates are within the selected radius from the selected location.
+   * @param eventCoordinates - The coordinates of the event.
+   * @returns True if the event is within the radius, false otherwise.
+   */
+  isWithinRadius(eventCoordinates: { lat: number; lng: number; }) {
+    const center = L.latLng(this.selectedLocation);
+    const eventLocation = L.latLng(eventCoordinates.lat, eventCoordinates.lng);
+    const distance = center.distanceTo(eventLocation);
+    return distance <= this.selectedRadius * 1000;
+  }
+
+  /**
+   * Shows the details of an attraction in a modal by using the EventDetailComponent.
+   * 
+   * @param attractionId - The ID of the attraction.
+   * @param locationId - The ID of the location.
+   * @param event - The event object.
+   * @returns A promise that resolves when the details are shown.
+   */
   async showAttractionDetails(attractionId: any, locationId: any, event: any): Promise<void> {
     if (this.isModalOpen) {
       return;

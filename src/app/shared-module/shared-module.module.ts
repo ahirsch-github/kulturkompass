@@ -9,6 +9,10 @@ import { EventDetailComponent } from '../components/event-detail/event-detail.co
 
 
 
+/**
+ * The SharedModuleModule is a module that contains shared components, services, and modules
+ * that can be used across multiple modules in the application.
+ */
 @NgModule({
   declarations: [SearchBarComponent, EventDetailComponent],
   imports: [
