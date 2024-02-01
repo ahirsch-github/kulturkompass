@@ -33,10 +33,12 @@
     "@mapbox/leaflet-pip": "^1.1.0",
     "@turf/turf": "^6.5.0",
     "@types/leaflet.markercluster": "^1.5.4",
+    "confetti-js": "^0.0.18",
     "ionicons": "^7.0.0",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "ngx-cookie-service": "^16.1.0",
+    "party-js": "^2.2.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "^0.13.0"

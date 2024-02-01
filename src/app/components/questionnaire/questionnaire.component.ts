@@ -58,13 +58,16 @@ export class QuestionnaireComponent implements OnInit {
   };
 
 
-  constructor(
-    private modalCtrl: ModalController,
-    private cookieService: CookieService,
-  ){}
+  constructor(private modalCtrl: ModalController, private cookieService: CookieService){}
+
   ngOnInit() {  
   }
 
+  /**
+   * Handles the checkbox change event.
+   * @param e - The event object.
+   * @param formControlName - The name of the form control.
+   */
   onCheckboxChange(e: any, formControlName: string) {
     if(formControlName === 'costs') {
       if(e.detail.value) {
@@ -108,6 +111,9 @@ export class QuestionnaireComponent implements OnInit {
     return o1 === o2;
   }
 
+  /**
+   * Close modal and save selection
+   */
   submitAnswers() {
     const eventCategoriesWithId = [];
 
@@ -135,6 +141,9 @@ export class QuestionnaireComponent implements OnInit {
     this.modalCtrl.dismiss();
   }
 
+  /**
+   * Close modal without saving the selection
+   */
   closeModal() {
     this.modalCtrl.dismiss();
   }

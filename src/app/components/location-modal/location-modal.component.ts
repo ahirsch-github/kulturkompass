@@ -26,36 +26,22 @@ export class LocationModalComponent implements OnInit {
   }
 
   ngAfterViewInit() {
+    // make sure that the map is correctly initialized 
     setTimeout(() => this.initMap(), 300);
-    // this.waitForModal().then(() => this.initMap());
   }
 
-  waitForModal(): Promise<void> {
-    return new Promise(resolve => {
-      const checkVisibility = () => {
-        if (this.isModalOpen()) {
-          resolve();
-        } else {
-          setTimeout(checkVisibility, 100);
-        }
-      };
-      checkVisibility();
-    });
-  }
-
-  isModalOpen(): any {
-    const modal = document.querySelector('ion-modal');
-    return modal && getComputedStyle(modal).display !== 'none';
-  }
-
+  /**
+   * Initializes the map and sets up the necessary configurations.
+   */
   initMap(): void {
     if (!this.selectedLocation) {
-      this.selectedLocation = this.defaultLocation; // Berlin Mitte
+      this.selectedLocation = this.defaultLocation;
     }
   
     this.map = L.map('modal-map').setView(this.selectedLocation, 13);
     this.map.zoomControl.remove();
 
+    // check if the user has currently selected dark mode as his color scheme
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     let tiles;
@@ -83,6 +69,12 @@ export class LocationModalComponent implements OnInit {
     });
   }
   
+  /**
+   * Sets the marker and radius on the map based on the given location and radius.
+   * Removes the previous marker and circle if they exist.
+   * @param location The location coordinates where the marker should be placed.
+   * @param radius The radius in kilometers for the circle around the marker.
+   */
   setMarkerAndRadius(location: any, radius: any): void {
     if (this.currentMarker) {
       this.map.removeLayer(this.currentMarker);
@@ -112,19 +104,11 @@ export class LocationModalComponent implements OnInit {
   
     this.map.setView(location, zoomLevel);
   }
-  
 
-  confirmLocation(): void {
-    this.modalCtrl.dismiss({
-      location: this.selectedLocation,
-      radius: this.selectedRadius
-    });
-  }
-
-  closeModal(): void {
-    this.modalCtrl.dismiss();
-  }
-
+  /**
+   * Handles the change event of the radius input.
+   * @param event - The event object containing the new radius value.
+   */
   onRadiusChange(event: any): void {
     this.selectedRadius = event.detail.value;
     
@@ -152,6 +136,11 @@ export class LocationModalComponent implements OnInit {
     this.selectedLocation = e.latlng;
   }
 
+  /**
+   * Handles the selection change event.
+   * @param event - The event object containing the selected value.
+   * @returns void
+   */
   onSelectionChange(event: any): void {
     let bezirkkey = event.detail.value;
 
@@ -187,14 +176,16 @@ export class LocationModalComponent implements OnInit {
     this.getLocation();
   }
 
+  /**
+   * Retrieves the current location.
+   * If the platform is hybrid, it uses Geolocation.getCurrentPosition() to get the position.
+   * If the platform is not hybrid, it uses the map to locate the user's position.
+   */
   async getLocation() {
     let position: any;
 
     if (isPlatform('hybrid')) {
-      
-      // Use Capacitor's Geolocation API for iOS and Android
       position = await Geolocation.getCurrentPosition();
-      // set coordinates if position is found, otherwise use default location
       if (position) {
         this.selectedLocation = [position.coords.latitude, position.coords.longitude];
       } else {
@@ -209,14 +200,39 @@ export class LocationModalComponent implements OnInit {
     }
   }
   
+  /**
+   * Callback function triggered when a location is found.
+   * @param e - The event object containing the accuracy and latlng properties.
+   */
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
     this.selectedLocation = e.latlng;
     this.setMarkerAndRadius(this.selectedLocation, this.selectedRadius);
   }
 
+  /**
+   * Handles the error that occurs during location retrieval.
+   * @param e - The error object.
+   */
   private onLocationError = (e: any) => {
     console.error(e.message);
     this.setMarkerAndRadius([52.5200, 13.4050], this.selectedRadius);
+  }
+
+  /**
+   * Close modal and save selection
+   */
+  confirmLocation(): void {
+    this.modalCtrl.dismiss({
+      location: this.selectedLocation,
+      radius: this.selectedRadius
+    });
+  }
+
+  /**
+   * Close modal without saving the selection
+   */
+  closeModal(): void {
+    this.modalCtrl.dismiss();
   }
 
 }

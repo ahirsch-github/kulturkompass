@@ -89,30 +89,7 @@ export class FilterMenuComponent  implements OnInit {
     this.isFreeOfChargeSelected = this.filters.isFreeOfChargeSelected || false;
   }
 
-  handleAccessibilityChange(event: any) {
-    this.selectedAccessibilities = event.detail.value;
-  }
-
-  handleCategoryChange(event: any) {
-    this.selectedCategories = event.detail.value;
-  }
-
-  handleBoroughChange(event: any) {
-    this.selectedBoroughs = event.detail.value;
-  }
-
-  handlePriceChange(event: any) {
-    this.isFreeOfChargeSelected = event.detail.checked;
-  }
-
-  handleDateChange( event: any) {
-    this.selectedDates = event.detail.value;
-  }
-
-  handleTimeChange(event: any) {
-    this.selectedTimes = event.detail.value;
-  }
-
+  // close the modal and return the filters
   applyFilters() {
     this.modalCtrl.dismiss({
       'selectedDates': this.selectedDates,
@@ -126,8 +103,21 @@ export class FilterMenuComponent  implements OnInit {
     });
   }
 
-  closeModal() {
-    this.modalCtrl.dismiss();
+  async openLocationSelectionModal() {
+    const modal = await this.modalCtrl.create({
+      component: LocationModalComponent,
+      cssClass: 'half-height-modal',
+      componentProps: {
+        'selectedLocation': this.defaultLocation,
+        'selectedRadius': 3,
+      }
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      this.selectedLocation = data.location;
+      this.selectedRadius = data.radius;
+    }
   }
 
   resetFilters() {
@@ -162,21 +152,32 @@ export class FilterMenuComponent  implements OnInit {
     return o1 && o2 ? o1.name === o2.name : o1 === o2;
   }
 
-  async openLocationSelectionModal() {
-    const modal = await this.modalCtrl.create({
-      component: LocationModalComponent,
-      cssClass: 'half-height-modal',
-      componentProps: {
-        'selectedLocation': this.defaultLocation,
-        'selectedRadius': 3,
-      }
-    });
-    await modal.present();
-    const { data } = await modal.onDidDismiss();
-    if (data) {
-      this.selectedLocation = data.location;
-      this.selectedRadius = data.radius;
-    }
+  handleAccessibilityChange(event: any) {
+    this.selectedAccessibilities = event.detail.value;
+  }
+
+  handleCategoryChange(event: any) {
+    this.selectedCategories = event.detail.value;
+  }
+
+  handleBoroughChange(event: any) {
+    this.selectedBoroughs = event.detail.value;
+  }
+
+  handlePriceChange(event: any) {
+    this.isFreeOfChargeSelected = event.detail.checked;
+  }
+
+  handleDateChange( event: any) {
+    this.selectedDates = event.detail.value;
+  }
+
+  handleTimeChange(event: any) {
+    this.selectedTimes = event.detail.value;
+  }
+
+  closeModal() {
+    this.modalCtrl.dismiss();
   }
 
 }

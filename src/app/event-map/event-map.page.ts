@@ -37,10 +37,7 @@ export class EventMapPage implements OnInit {
   markerClusterGroup: L.MarkerClusterGroup | undefined;
   attractionIds: string[] = [];
   isModalOpen: boolean = false;
-
   eventsByLocation: Map<string, any[]> = new Map<string, any[]>();
-
-  // Map zum Speichern des aktuellen Indexes für jedes Event-Set basierend auf dem Schlüssel
   private carouselIndexMap: Map<string, number> = new Map<string, number>();
 
   ngOnInit() {
@@ -51,56 +48,54 @@ export class EventMapPage implements OnInit {
     setTimeout(() => this.map.invalidateSize(), 0);
   }
 
-  async openLocationModal() {
-    const modal = await this.modalController.create({
-      component: LocationModalComponent,
-      cssClass: 'half-height-modal',
-      componentProps: {
-        'selectedLocation': this.selectedLocation || this.defaultLocation,
-        'selectedRadius': this.selectedRadius || 3
-      }
+  /**
+   * Initializes the map and sets up the necessary configurations.
+   */
+  private initMap(): void {
+    this.map = L.map('map', {
+      center: this.defaultLocation,
+      zoomControl: false,
     });
-    await modal.present();
-    const { data } = await modal.onDidDismiss();
-    if (data) {
-      this.selectedLocation = data.location;
-      this.selectedRadius = data.radius;
 
-      this.setBezirk();
+    // select selected mode from user (dark or light)
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-      if (this.map && this.selectedLocation && this.selectedRadius) {
-          if (this.currentMarker) {
-            this.map.removeLayer(this.currentMarker);
-          }
-          if (this.currentCircle) {
-            this.map.removeLayer(this.currentCircle);
-          }
+    let tiles;
 
-          this.currentCircle = L.circle(this.selectedLocation, {
-            color: '#473077',
-            fillColor: '#473077',
-            fillOpacity: 0.2,
-            radius: (this.selectedRadius || 0)  * 1000,
-            interactive: false
-          }).addTo(this.map);
-
-          const bounds = this.currentCircle.getBounds();
-          const zoomLevel = this.map.getBoundsZoom(bounds);
-
-          let bezirkName = '';
-          for (const bezirk in BerlinBezirkeLatLng) {
-            const [lat, lng] = BerlinBezirkeLatLng[bezirk];
-            if (lat === this.selectedLocation.lat && lng === this.selectedLocation.lng) {
-              bezirkName = bezirk;
-              break;
-            }
-          }          
-          this.map.setView(this.selectedLocation, zoomLevel);
-          this.applyFilters();
-        }
+    if (prefersDark) {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap, © Stadia Maps'
+      });
+    } else {
+      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 11,
+        attribution: '© OpenStreetMap contributors, © Stadia Maps'
+      });
     }
+    tiles.addTo(this.map);
+
+    this.markerClusterGroup = L.markerClusterGroup({
+      iconCreateFunction: (cluster) => {
+        const childCount = cluster.getChildCount();  
+        return L.divIcon({
+          html: `<div><span>${childCount}</span></div>`,
+          className: 'map-marker-cluster',
+          iconSize: L.point(35, 35)
+        });
+      },
+      maxClusterRadius: 40
+    });
+    this.getLocation();
   }
 
+  /**
+   * Sets the bezirk (district) based on the selected location.
+   * If the selected location matches a district's coordinates, the corresponding district name is assigned to `this.bezirk`.
+   * If no district is found for the selected location, `this.bezirk` is set to 'Ausgewählter Standort' (Selected Location).
+   */
   setBezirk() {
     if(this.map) {
       let bezirkName = '';
@@ -116,23 +111,6 @@ export class EventMapPage implements OnInit {
         this.bezirk = 'Ausgewählter Standort';
       }
     }
-  }
-
-  onFreeFilterToggle(): void {
-    this.isFree = !this.isFree;
-    this.applyFilters();
-  }
-
-   onTodayFilterToggle(): void {
-    this.isToday = true;
-    this.isTomorrow = false;
-    this.applyFilters();
-  }
-
-  onTomorrowFilterToggle(): void {
-    this.isToday = false;
-    this.isTomorrow = true;
-    this.applyFilters();
   }
 
   private applyFilters(): void {
@@ -368,9 +346,7 @@ export class EventMapPage implements OnInit {
     } else {
       this.isModalOpen = true;
       this.kulturdatenService.getAttractionById(attractionId).subscribe(response => {
-  
         let attraction = response.data.attraction;
-  
         this.kulturdatenService.getLocationById(locationId).subscribe(async response => {
           const modal = await this.modalController.create({
             component: EventDetailComponent,
@@ -386,85 +362,94 @@ export class EventMapPage implements OnInit {
                 isAccessibleForFree: event.ticketType
               }
             }
-        });
+          });
         await modal.present();
         modal.onDidDismiss().then(() => {
           this.isModalOpen = false;
         });
+        }, error => {
+          console.error('Ein Fehler ist aufgetreten:', error);
+        });
       }, error => {
         console.error('Ein Fehler ist aufgetreten:', error);
       });
-    }, error => {
-      console.error('Ein Fehler ist aufgetreten:', error);
-    });
+    }
   }
-  }
-
   
-
-  private initMap(): void {
-    this.map = L.map('map', {
-      center: this.defaultLocation,
-      zoomControl: false,
+  /**
+   * Opens the modal LocationModalComponent and allows the user to select a location and radius.
+   * Updates the selected location and radius based on the user's selection.
+   * Sets the map view to the selected location and applies filters.
+   */
+  async openLocationModal() {
+    const modal = await this.modalController.create({
+      component: LocationModalComponent,
+      cssClass: 'half-height-modal',
+      componentProps: {
+        'selectedLocation': this.selectedLocation || this.defaultLocation,
+        'selectedRadius': this.selectedRadius || 3
+      }
     });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      this.selectedLocation = data.location;
+      this.selectedRadius = data.radius;
 
-    // select selected mode from user (dark or light)
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.setBezirk();
 
-    let tiles;
+      if (this.map && this.selectedLocation && this.selectedRadius) {
+          if (this.currentMarker) {
+            this.map.removeLayer(this.currentMarker);
+          }
+          if (this.currentCircle) {
+            this.map.removeLayer(this.currentCircle);
+          }
 
-    if (prefersDark) {
-      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        minZoom: 11,
-        attribution: '© OpenStreetMap, © Stadia Maps'
-      });
-    } else {
-      tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        minZoom: 11,
-        attribution: '© OpenStreetMap contributors, © Stadia Maps'
-      });
+          this.currentCircle = L.circle(this.selectedLocation, {
+            color: '#473077',
+            fillColor: '#473077',
+            fillOpacity: 0.2,
+            radius: (this.selectedRadius || 0)  * 1000,
+            interactive: false
+          }).addTo(this.map);
+
+          const bounds = this.currentCircle.getBounds();
+          const zoomLevel = this.map.getBoundsZoom(bounds);
+
+          let bezirkName = '';
+          for (const bezirk in BerlinBezirkeLatLng) {
+            const [lat, lng] = BerlinBezirkeLatLng[bezirk];
+            if (lat === this.selectedLocation.lat && lng === this.selectedLocation.lng) {
+              bezirkName = bezirk;
+              break;
+            }
+          }          
+          this.map.setView(this.selectedLocation, zoomLevel);
+          this.applyFilters();
+        }
     }
-    tiles.addTo(this.map);
-
-    this.markerClusterGroup = L.markerClusterGroup({
-      iconCreateFunction: (cluster) => {
-        const childCount = cluster.getChildCount();  
-        return L.divIcon({
-          html: `<div><span>${childCount}</span></div>`,
-          className: 'map-marker-cluster',
-          iconSize: L.point(35, 35)
-        });
-      },
-      maxClusterRadius: 40
-    });
-    // this.getLocation();
-
-    if(isPlatform('hybrid')) {
-      this.getLocation();
-    } else {
-      this.getLocation();
-    }
-    
   }
 
-
+  /**
+   * Asks for location access and sets the location
+   */
   private getLocation() {
     this.map.locate({setView: true, maxZoom: 13});
     this.map.on('locationfound', this.onLocationFound);
     this.map.on('locationerror', this.onLocationError);
   }
 
+  /**
+   * Callback function triggered when a location is found. Uses the Geolocation from capacitor to select the coordinates for hybrid devices
+   * @param e - The event object containing the accuracy and latlng properties.
+   */
   private onLocationFound = (e: { accuracy: any; latlng: L.LatLngExpression; }) => {
-    console.log('location found');
     this.selectedLocation = e.latlng;
-    console.log(this.selectedLocation);
 
     if (isPlatform('hybrid')) {
       Geolocation.getCurrentPosition().then((resp) => {
         this.selectedLocation = [resp.coords.latitude, resp.coords.longitude];
-        console.log(this.selectedLocation);
         this.applyFilters();
         this.setBezirk();
       }).catch((error) => {
@@ -477,13 +462,16 @@ export class EventMapPage implements OnInit {
   }
 
   private onLocationError = (e: any) => {
-    console.log('location error');
     console.error(e.message);
     this.selectedLocation = this.defaultLocation;
     this.applyFilters();
     this.setBezirk();
   }
 
+  /**
+   * Handles the start of a search.
+   * @param term - The search term.
+   */
   onSearchStart(term: any): void {
     if (term === '') {
       this.attractionIds = [];
@@ -497,6 +485,23 @@ export class EventMapPage implements OnInit {
         console.error('Ein Fehler ist aufgetreten:', error);
       });        
     }
+  }
+
+  onFreeFilterToggle(): void {
+    this.isFree = !this.isFree;
+    this.applyFilters();
+  }
+
+   onTodayFilterToggle(): void {
+    this.isToday = true;
+    this.isTomorrow = false;
+    this.applyFilters();
+  }
+
+  onTomorrowFilterToggle(): void {
+    this.isToday = false;
+    this.isTomorrow = true;
+    this.applyFilters();
   }
 
   formatDate(date: string): string {
