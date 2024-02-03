@@ -28,17 +28,28 @@ export class HomePage implements OnInit {
   isPersonalized: boolean = false;
   isLoading = false;
   idsToFilter: string[] = [];
+  isCookieAccepted = false;
 
   constructor(
     private modalCtrl: ModalController,
     private cookieService: CookieService,
     private kulturdatenService: KulturdatenService,
     private datePipe: DatePipe,
-  ) {}
+  ) {this.isCookieAccepted = this.cookieService.check('isCookieAccepted');}
 
   ngOnInit() {
     this.showQuestionnaireIfNeeded();
     this.loadEvents();
+  }
+
+  acceptCookies() {
+    this.cookieService.set('isCookieAccepted', 'true', { expires: 90 });
+    this.isCookieAccepted = true;
+  }
+
+  rejectCookies() {
+    this.cookieService.deleteAll();
+    this.isCookieAccepted = true;
   }
   
   /**
@@ -47,8 +58,7 @@ export class HomePage implements OnInit {
    * @returns {Promise<void>} A promise that resolves when the questionnaire is dismissed.
    */
   private async showQuestionnaireIfNeeded() {
-    const isFirstTime = localStorage.getItem('hasVisited') === null;
-    if (1==1) { //TODO: change to isFirstTime for production
+    if (this.isCookieAccepted == false) {
       const modal = await this.modalCtrl.create({
         component: QuestionnaireComponent
       });
