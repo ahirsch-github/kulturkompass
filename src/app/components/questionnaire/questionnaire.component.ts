@@ -118,9 +118,7 @@ export class QuestionnaireComponent implements OnInit {
     const eventCategoriesWithId = [];
 
     for (let category of this.categories) {
-      console.log(category.name);
       for (let filter of this.filters.eventCategories) {
-        console.log(filter);
         if (category.name === filter) {
           eventCategoriesWithId.push(category.id);
         }
@@ -136,9 +134,10 @@ export class QuestionnaireComponent implements OnInit {
     this.filters.accessibilityPreferences = accessibilityPreferencesWithId;
 
     const stringifiedAnswers = JSON.stringify(this.filters);
-    this.cookieService.set('userType', stringifiedAnswers);
     localStorage.setItem('hasVisited', 'true');
-    this.modalCtrl.dismiss();
+    this.modalCtrl.dismiss({
+      preferences: stringifiedAnswers,
+    });
   }
 
   /**

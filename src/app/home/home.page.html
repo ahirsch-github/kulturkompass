@@ -1,17 +1,5 @@
 <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
 <ion-content>
-  <ion-footer *ngIf="!isCookieAccepted">
-    <ion-toolbar color="light">
-      <ion-text color="dark" class="ion-padding-horizontal">
-        Wir verwenden Cookies, um sicherzustellen, dass Sie die beste Erfahrung auf unserer Website erhalten.
-        <a href="https://kulturkompass.com/cookie-policy">Weitere Informationen</a>
-      </ion-text>
-      <ion-buttons slot="end">
-        <ion-button color="primary" (click)="acceptCookies()">Gibts auch Milch?</ion-button>
-        <ion-button color="primary" (click)="rejectCookies()">Glutenunverträglich!</ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-footer>
   <ion-list *ngIf="!isLoading">
     <ng-container *ngFor="let event of events">
       <ion-card *ngFor="let attraction of event.attractions" (click)="showAttractionDetails(attraction.referenceId, event.locations[0].referenceId, event.schedule.startDate, event.schedule.endDate, event.schedule.startTime, event.schedule.endTime, event.admission?.ticketType)">
