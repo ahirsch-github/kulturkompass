@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" color="473077">
+<ion-content>
 
   <div class="title-frame-item">
     <div class="title-item">
@@ -29,19 +29,21 @@
     </ion-item>
     <ion-item class="detail-item">
       <ng-container *ngIf="event.startTime === '00:00:00' && event.endTime === '00:00:00'">
-      ⌛  Ganztägig
+      ⌛ Ganztägig
       </ng-container>
       <ng-container *ngIf="event.startTime !== '00:00:00' || event.endTime !== '00:00:00'">
        ⏰ {{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}
       </ng-container>
     </ion-item>
-    <ion-item class="detail-item">
+    <ion-item *ngIf="event.isAccessibleForFree" class="detail-item">
       <ng-container *ngIf="event.isAccessibleForFree">
-      💰  Kostenlos
+      💰 Kostenlos
       </ng-container>
     </ion-item>
     <ion-item class="detail-item">
-     💡 Details <br> {{ attraction.description.de }}
+      <div style="width: 100%;">
+      💡 Details <br> {{ attraction.description.de }}
+      </div>
     </ion-item>
   </ion-list>
   <br>
