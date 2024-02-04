@@ -1,51 +1,51 @@
+<app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
+<!-- toolbar with a border like the header menu has -->
+  <ion-toolbar style="box-shadow:  0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);">
+    <ion-buttons slot="start" class="badge-container">
+      <ion-badge style="cursor: pointer;" (click)="openFilterMenuModal()">
+        <ion-icon class="icon-margin-right" name="options"></ion-icon>
+        Filter
+      </ion-badge>
+      <ng-container *ngIf="filters.boroughs.length > 0">
+        <ion-badge *ngFor="let borough of filters.boroughs" color="secondary">
+          {{ borough }}
+          <ion-icon class="icon-margin-left" name="close-circle" (click)="removeBorough(borough)"></ion-icon>
+        </ion-badge>
+      </ng-container>
+      <ng-container *ngIf="selectedCategoryNames.length > 0">
+        <ion-badge *ngFor="let category of selectedCategoryNames" color="secondary">
+          {{ category }}
+          <ion-icon class="icon-margin-left" name="close-circle" (click)="removeCategory(category)"></ion-icon>
+        </ion-badge>
+      </ng-container>
+      <ng-container *ngIf="filters.dates.length > 0">
+        <ion-badge color="secondary">
+          Datum
+          <ion-icon class="icon-margin-left" name="close-circle" (click)="removeDate()"></ion-icon>
+        </ion-badge>
+      </ng-container>
+      <ng-container *ngIf="filters.times.length > 0">
+        <ion-badge *ngFor="let time of filters.times" color="secondary">
+          {{ time }}
+          <ion-icon class="icon-margin-left" name="close-circle" (click)="removeTime(time)"></ion-icon>
+        </ion-badge>
+      </ng-container>
+      <ng-container *ngIf="selectedAccessibilityNames.length > 0">
+        <ion-badge color="secondary">
+          Barrierefrei
+          <ion-icon class="icon-margin-left" name="close-circle" (click)="removeAccessibility()"></ion-icon>
+        </ion-badge>
+      </ng-container>
+      <ng-container *ngIf="filters.isFreeOfChargeSelected">
+        <ion-badge color="secondary">
+          Kostenlos
+          <ion-icon class="icon-margin-left" name="close-circle" (click)="removeFreeOfCharge()"></ion-icon>
+        </ion-badge>
+      </ng-container>
+    </ion-buttons>
+  </ion-toolbar>
   <ion-content id="main-content">
-    <app-search-bar (searchTerm)="onSearchStart($event)"></app-search-bar>
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start" class="badge-container">
-          <ion-badge style="cursor: pointer;" (click)="openFilterMenuModal()">
-            <ion-icon class="icon-margin-right" name="options"></ion-icon>
-            Filter
-          </ion-badge>
-          <ng-container *ngIf="filters.boroughs.length > 0">
-            <ion-badge *ngFor="let borough of filters.boroughs" color="secondary">
-              {{ borough }}
-              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeBorough(borough)"></ion-icon>
-            </ion-badge>
-          </ng-container>
-          <ng-container *ngIf="selectedCategoryNames.length > 0">
-            <ion-badge *ngFor="let category of selectedCategoryNames" color="secondary">
-              {{ category }}
-              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeCategory(category)"></ion-icon>
-            </ion-badge>
-          </ng-container>
-          <ng-container *ngIf="filters.dates.length > 0">
-            <ion-badge color="secondary">
-              Datum
-              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeDate()"></ion-icon>
-            </ion-badge>
-          </ng-container>
-          <ng-container *ngIf="filters.times.length > 0">
-            <ion-badge *ngFor="let time of filters.times" color="secondary">
-              {{ time }}
-              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeTime(time)"></ion-icon>
-            </ion-badge>
-          </ng-container>
-          <ng-container *ngIf="selectedAccessibilityNames.length > 0">
-            <ion-badge color="secondary">
-              Barrierefrei
-              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeAccessibility()"></ion-icon>
-            </ion-badge>
-          </ng-container>
-          <ng-container *ngIf="filters.isFreeOfChargeSelected">
-            <ion-badge color="secondary">
-              Kostenlos
-              <ion-icon class="icon-margin-left" name="close-circle" (click)="removeFreeOfCharge()"></ion-icon>
-            </ion-badge>
-          </ng-container>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    
       <ion-list *ngIf="!isLoading">
       <ng-container *ngFor="let event of events?.events">
       <ion-card *ngFor="let attraction of event.attractions" (click)="showAttractionDetails(attraction.referenceId, event.locations[0].referenceId, event.schedule.startDate, event.schedule.endDate, event.schedule.startTime, event.schedule.endTime, event.admission?.ticketType)">

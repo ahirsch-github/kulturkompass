@@ -6,7 +6,6 @@ import { ModalController } from '@ionic/angular';
 import { CookieService } from 'ngx-cookie-service';
 import { KulturdatenService } from '../services/kulturdaten.service';
 import { DatePipe } from '@angular/common';
-import { FormGroup, FormBuilder } from '@angular/forms';
 import { EventDetailComponent } from '../components/event-detail/event-detail.component';
 import { CookieBannerComponent } from '../components/cookie-banner/cookie-banner.component';
 
@@ -41,7 +40,11 @@ export class HomePage implements OnInit {
     this.showQuestionnaireIfNeeded();
   }
 
-  // open the cookie banner if the user has not visited the page before
+  /**
+   * Opens the cookie banner modal.
+   * @param preferences - The preferences for the cookie banner.
+   * @returns A promise that resolves when the modal is presented.
+   */
   async openCookieBanner(preferences: any) {
     if (this.cookieService.check('isCookieAccepted') == false || this.cookieService.check('isCookieAccepted') == true) {
       const modal = await this.modalCtrl.create({
@@ -61,9 +64,11 @@ export class HomePage implements OnInit {
   }
   
   /**
-   * Shows the questionnaire if it is the user's first time visiting the page.
-   * Otherwise, it personalizes the event categories.
-   * @returns {Promise<void>} A promise that resolves when the questionnaire is dismissed.
+   * Checks if the cookie is accepted and shows the questionnaire if needed.
+   * If the cookie 'isCookieAccepted' doesn't exist, a modal with the QuestionnaireComponent is created and displayed.
+   * After the modal is dismissed, the preferences are retrieved and used to personalize event categories.
+   * The events are then loaded and the cookie banner is opened.
+   * If the cookie is already existing, the event categories are personalized and the events are loaded.
    */
   private async showQuestionnaireIfNeeded() {
     if (this.isCookieAccepted == false) {
@@ -76,11 +81,7 @@ export class HomePage implements OnInit {
         this.eventCat = JSON.parse(preferences)
         this.persolanizeEventCat()
         this.loadEvents();
-        
-        // TODO: uncomment the if statement for production
-        // if (!this.cookieService.check('isCookieAccepted')) {
-          this.openCookieBanner(preferences);
-        // }
+        this.openCookieBanner(preferences);
       });
       return await modal.present();
     } else {
