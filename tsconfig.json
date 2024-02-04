@@ -22,7 +22,8 @@
       "es2018", 
       "dom"
     ],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "allowSyntheticDefaultImports": true //für confetti
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

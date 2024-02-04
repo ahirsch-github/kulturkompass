@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import confetti from 'canvas-confetti';
 
 
 @Component({
@@ -10,6 +11,7 @@ import { ModalController } from '@ionic/angular';
 })
 export class EventDetailComponent  implements OnInit {
 
+  title = 'confetti';
   constructor(private modalCtrl: ModalController, private datePipe: DatePipe) { }
 
   @Input() attraction: any;
@@ -30,6 +32,16 @@ export class EventDetailComponent  implements OnInit {
 
   formatTime(time: string): string {
     return time.substr(0, 5) || '';
+  }
+
+  
+  onConfettiPressed(): void{
+    confetti({
+      particleCount: 250,
+      spread: 100,
+      origin: {y:0.6},
+      colors: ['#473077', '#FFB624','#ffbe3e', '#D7D2DB', '#FFE8C2']
+    })
   }
 
 }
