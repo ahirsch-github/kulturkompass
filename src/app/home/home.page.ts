@@ -46,7 +46,10 @@ export class HomePage implements OnInit {
    * @returns A promise that resolves when the modal is presented.
    */
   async openCookieBanner(preferences: any) {
-    if (this.cookieService.check('isCookieAccepted') == false || this.cookieService.check('isCookieAccepted') == true) {
+
+    // TODO: uncomment if for production, comment for development
+
+    // if (this.cookieService.check('isCookieAccepted') == false || this.cookieService.check('isCookieAccepted') == true) {
       const modal = await this.modalCtrl.create({
         component: CookieBannerComponent,
         cssClass: 'cookie-banner-modal',
@@ -60,7 +63,7 @@ export class HomePage implements OnInit {
         }
       });
       return await modal.present();
-    }
+    // }
   }
   
   /**
@@ -71,7 +74,10 @@ export class HomePage implements OnInit {
    * If the cookie is already existing, the event categories are personalized and the events are loaded.
    */
   private async showQuestionnaireIfNeeded() {
-    if (this.isCookieAccepted == false) {
+
+    // TODO: uncomment if and else for production, comment for development
+
+    // if (this.isCookieAccepted == false) {
       const modal = await this.modalCtrl.create({
         component: QuestionnaireComponent
       });
@@ -84,13 +90,13 @@ export class HomePage implements OnInit {
         this.openCookieBanner(preferences);
       });
       return await modal.present();
-    } else {
-      if (this.cookieService.check('preferences')) {
-        this.persolanizeEventCat();
-        this.loadEvents();
-      }
-      this.loadEvents();
-    }
+    // } else {
+    //   if (this.cookieService.check('preferences')) {
+    //     this.persolanizeEventCat();
+    //     this.loadEvents();
+    //   }
+    //   this.loadEvents();
+    // }
   }
 
   /**
@@ -164,7 +170,7 @@ export class HomePage implements OnInit {
   }
   
   /**
-   * Persolanizes the event categories based on the user's preferences stored in the cookie 'userType'.
+   * Persolanizes the event categories based on the user's preferences stored in the cookie 'preferences'.
    */
   private persolanizeEventCat() {
     const userTypeCookie = this.cookieService.get('preferences');
