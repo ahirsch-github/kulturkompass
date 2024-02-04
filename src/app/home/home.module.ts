@@ -9,6 +9,7 @@ import { DatePipe } from '@angular/common';
 import { HomePageRoutingModule } from './home-routing.module';
 import { SharedModuleModule } from '../shared-module/shared-module.module';
 import { QuestionnaireComponent } from '../components/questionnaire/questionnaire.component';
+import { CookieBannerComponent } from '../components/cookie-banner/cookie-banner.component';
 
 
 @NgModule({
@@ -19,7 +20,7 @@ import { QuestionnaireComponent } from '../components/questionnaire/questionnair
     SharedModuleModule,
     CommonModule,
   ],
-  declarations: [HomePage, QuestionnaireComponent],
+  declarations: [HomePage, QuestionnaireComponent, CookieBannerComponent],
   providers: [DatePipe]
 })
 export class HomePageModule {}

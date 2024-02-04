@@ -6,8 +6,8 @@ import { ModalController } from '@ionic/angular';
 import { CookieService } from 'ngx-cookie-service';
 import { KulturdatenService } from '../services/kulturdaten.service';
 import { DatePipe } from '@angular/common';
-import { FormGroup, FormBuilder } from '@angular/forms';
 import { EventDetailComponent } from '../components/event-detail/event-detail.component';
+import { CookieBannerComponent } from '../components/cookie-banner/cookie-banner.component';
 
 @Component({
   selector: 'app-home',
@@ -25,9 +25,9 @@ export class HomePage implements OnInit {
   attractions: any;
   availableTags: any;
   page: number = 0;
-  isPersonalized: boolean = false;
   isLoading = false;
   idsToFilter: string[] = [];
+  isCookieAccepted = this.cookieService.check('isCookieAccepted')
 
   constructor(
     private modalCtrl: ModalController,
@@ -38,29 +38,58 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
     this.showQuestionnaireIfNeeded();
-    this.loadEvents();
+  }
+
+  /**
+   * Opens the cookie banner modal.
+   * @param preferences - The preferences for the cookie banner.
+   * @returns A promise that resolves when the modal is presented.
+   */
+  async openCookieBanner(preferences: any) {
+    if (this.cookieService.check('isCookieAccepted') == false || this.cookieService.check('isCookieAccepted') == true) {
+      const modal = await this.modalCtrl.create({
+        component: CookieBannerComponent,
+        cssClass: 'cookie-banner-modal',
+        componentProps: {
+          preferences: preferences
+        }
+      });
+      modal.onDidDismiss().then((data) => {
+        if (this.cookieService.get('isCookieAccepted') == 'true') {
+          const preferences = this.cookieService.get('preferences');
+        }
+      });
+      return await modal.present();
+    }
   }
   
   /**
-   * Shows the questionnaire if it is the user's first time visiting the page.
-   * Otherwise, it personalizes the event categories.
-   * @returns {Promise<void>} A promise that resolves when the questionnaire is dismissed.
+   * Checks if the cookie is accepted and shows the questionnaire if needed.
+   * If the cookie 'isCookieAccepted' doesn't exist, a modal with the QuestionnaireComponent is created and displayed.
+   * After the modal is dismissed, the preferences are retrieved and used to personalize event categories.
+   * The events are then loaded and the cookie banner is opened.
+   * If the cookie is already existing, the event categories are personalized and the events are loaded.
    */
   private async showQuestionnaireIfNeeded() {
-    const isFirstTime = localStorage.getItem('hasVisited') === null;
-    if (1==1) { //TODO: change to isFirstTime for production
+    if (this.isCookieAccepted == false) {
       const modal = await this.modalCtrl.create({
         component: QuestionnaireComponent
       });
     
       modal.onDidDismiss().then((data) => {
-        this.persolanizeEventCat();
-        this.loadEvents(); // reload the events after the questionnaire is dismissed
+        const preferences = data.data.preferences;
+        this.eventCat = JSON.parse(preferences)
+        this.persolanizeEventCat()
+        this.loadEvents();
+        this.openCookieBanner(preferences);
       });
-
       return await modal.present();
     } else {
-      this.persolanizeEventCat();
+      if (this.cookieService.check('preferences')) {
+        this.persolanizeEventCat();
+        this.loadEvents();
+      }
+      this.loadEvents();
     }
   }
 
@@ -136,19 +165,13 @@ export class HomePage implements OnInit {
   
   /**
    * Persolanizes the event categories based on the user's preferences stored in the cookie 'userType'.
-   * If the user has selected any preferences, sets the 'isPersonalized' flag to true.
    */
   private persolanizeEventCat() {
-    const userTypeCookie = this.cookieService.get('userType');
+    const userTypeCookie = this.cookieService.get('preferences');
     if (userTypeCookie) {
       const preferences = JSON.parse(userTypeCookie);
       this.eventCat = preferences;
-      // check if the user has selected any preferences
-      if (this.eventCat && (this.eventCat.accessibilityPreferences || this.eventCat.eventCategories || this.eventCat.costs || this.eventCat.boroughPreferences)) {
-        this.isPersonalized = true;
-      }
-    } else {
-      console.log('userType cookie is not set');
+      this.loadEvents();
     }
   }
 
