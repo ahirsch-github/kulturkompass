@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { EventDetailComponent } from './event-detail.component';
+import * as confetti from 'canvas-confetti';
+import { AppComponent } from 'src/app/app.component';
 
 describe('EventDetailComponent', () => {
   let component: EventDetailComponent;
@@ -21,4 +23,6 @@ describe('EventDetailComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+
 });

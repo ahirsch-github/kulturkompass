@@ -1,6 +1,7 @@
+
 .title-frame-item {
     width: 100%;
-    height: 25%;
+    height: 24%;
     border-radius: 0 0 15% 15%; /* Border radius an der unteren Seite */
     background-color: #473077; /* Hintergrundfarbe */
     display: flex;
@@ -32,4 +33,14 @@
     line-height: 2;
     //text-align: justify;
     padding: 2% 0;
+}
+
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-wrapper{
+  margin: 16px;
 }
