@@ -1,6 +1,6 @@
-# kulturdaten
+# Kulturkompass
 
-Kulturdaten is an open-source library demonstrating how to utilize the API of the kulturdaten.berlin API, which is a project of the [Technologiestiftung Berlin](https://www.technologiestiftung-berlin.de), funded by the Senate Department for Culture and Social Cohesion, to discover events in Berlin.
+Kulturkompass is an open-source library demonstrating how to utilize the API of the kulturdaten.berlin API, which is a project of the [Technologiestiftung Berlin](https://www.technologiestiftung-berlin.de), funded by the Senate Department for Culture and Social Cohesion, to discover events in Berlin.
 
 ## Table of Contents
 1. [General Info](#general-info)
@@ -42,7 +42,7 @@ A list of technologies used within the project:
 ### Installation
 1. **Clone the repository**
 ```
-git clone https://github.com/ahirsch-github/kulturdaten.git
+git clone https://github.com/ahirsch-github/kulturkompass.git
 ```
 2. **Install dependencies**
 

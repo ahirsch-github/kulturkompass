@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">kulturdaten-berlin</string>
-    <string name="title_activity_main">kulturdaten-berlin</string>
-    <string name="package_name">com.kulturdaten.app</string>
-    <string name="custom_url_scheme">com.kulturdaten.app</string>
+    <string name="app_name">kulturkompass</string>
+    <string name="title_activity_main">kulturkompass</string>
+    <string name="package_name">com.kulturkompass.app</string>
+    <string name="custom_url_scheme">com.kulturkompass.app</string>
 </resources>

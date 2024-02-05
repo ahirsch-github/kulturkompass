@@ -83,8 +83,17 @@ export class HomePage implements OnInit {
       });
     
       modal.onDidDismiss().then((data) => {
-        const preferences = data.data.preferences;
-        this.eventCat = JSON.parse(preferences)
+        const preferences = data.data?.preferences;
+        if (preferences == undefined) {
+          this.eventCat = {
+            accessibilityPreferences: [],
+            eventCategories: [],
+            costs: false,
+            boroughPreferences: []
+          }
+        } else {
+          this.eventCat = JSON.parse(preferences);
+        }
         this.persolanizeEventCat()
         this.loadEvents();
         this.openCookieBanner(preferences);

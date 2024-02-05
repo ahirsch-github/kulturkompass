@@ -72,7 +72,7 @@ export class EventMapPage implements OnInit {
       tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', {
         maxZoom: 19,
         minZoom: 11,
-        attribution: '© OpenStreetMap contributors, © Stadia Maps'
+        attribution: '© OpenStreetMap, © Stadia Maps'
       });
     }
     tiles.addTo(this.map);
