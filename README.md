@@ -12,10 +12,6 @@ Kulturkompass is an open-source library demonstrating how to utilize the API of 
 ## General Info
 Finding a comprehensive overview of all cultural events in Berlin can be challenging. The kulturdaten.berlin API, provided by Technologiestiftung Berlin, aims to aggregate all events in one place, offering a central endpoint for discovery. This Ionic-based application supports both web and mobile devices, allowing users to list, search, and display events with various filters and map views.
 
-### Screenshot
-![Image text](https://www.united-internet.de/fileadmin/user_upload/Brands/Downloads/Logo_IONOS_by.jpg)
-
-
 ## Technologies
 A list of technologies used within the project:
 
