@@ -1,7 +1,7 @@
 # Kulturkompass
-
-<img src="./assets/logo.png" alt="Kulturkompass Logo" width="300" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
-
+<p align="center">
+  <img src="./assets/logo.png" alt="Kulturkompass Logo" width="200" style="max-width: 100%; height: auto;">
+</p>
 Kulturkompass is an open-source library demonstrating how to utilize the API of the kulturdaten.berlin API, which is a project of the [Technologiestiftung Berlin](https://www.technologiestiftung-berlin.de), funded by the Senate Department for Culture and Social Cohesion, to discover events in Berlin.
 
 ## Table of Contents
@@ -14,8 +14,7 @@ Kulturkompass is an open-source library demonstrating how to utilize the API of 
 ## General Info
 Finding a comprehensive overview of all cultural events in Berlin can be challenging. The kulturdaten.berlin API, provided by Technologiestiftung Berlin, aims to aggregate all events in one place, offering a central endpoint for discovery. This Ionic-based application supports both web and mobile devices, allowing users to list, search, and display events with various filters and map views.
 
-
-<div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px; margin-top: 20px;">
+<div align="center" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px; margin-top: 20px;">
   <img src="./assets/screenshots/event-list-page.jpg" alt="Event List Page" style="width: 250px; max-width: 100%; height: auto;">
   <img src="./assets/screenshots/event-detail-page.jpg" alt="Event Detail Page" style="width: 250px; max-width: 100%; height: auto;">
   <img src="./assets/screenshots/map-page.jpg" alt="Event Map Page" style="width: 250px; max-width: 100%; height: auto;">
